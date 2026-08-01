@@ -2,112 +2,110 @@
 
 ## Overview
 
-Fei is built with Electron + React + TypeScript for the renderer, with Tone.js handling audio synthesis. The application uses a modular architecture separating concerns across keyboard layout resolution, audio engine, action system, and UI components.
+Fei is built with Tauri (Rust) + React + TypeScript. The audio engine runs in native Rust via cpal, completely bypassing the webview for low-latency performance. React handles UI and state management via Zustand.
 
 ## Directory Structure
 
 ```
 fei/
-├── src/
-│   ├── main/                    # Electron main process
-│   │   ├── main.ts              # Entry point, window creation
-│   │   └── preload.ts           # Secure IPC bridge
-│   └── renderer/                # React application
-│       ├── App.tsx              # Root component, keyboard event handling
-│       ├── audio/
-│       │   ├── AudioEngine.ts   # Tone.js PolySynth wrapper
-│       │   ├── actions.ts       # Action executor
-│       │   └── metronome.ts     # Metronome with Tone.js Transport
-│       ├── components/
-│       │   ├── KeyboardHand.tsx # Hand panel with sound buttons
-│       │   ├── OctaveControl.tsx# Octave up/down buttons
-│       │   ├── KeyBindingTooltip.tsx  # Key display overlay
-│       │   ├── ActionsListModal.tsx    # All actions list
-│       │   ├── MetronomeControls.tsx   # Tempo, time signature
-│       │   ├── KeySelector.tsx        # Transposition dropdown
-│       │   ├── SettingsModal.tsx       # Settings panel
-│       │   └── TitleBar.tsx           # Window controls
-│       ├── keyboard/
-│       │   ├── layouts.ts       # Layout resolution
-│       │   └── keyBindings.ts   # Device key → action lookup
-│       ├── hooks/
-│       │   └── useAudioEngine.ts# Audio engine React hook
-│       └── styles/
-│           └── globals.css       # Global styles
-├── mappings/
-│   ├── actions.json             # All action definitions
-│   ├── dvorak-device.json       # DVORAK physical key positions
-│   ├── dvorak-semitones.json    # DVORAK finger → semitone
-│   ├── qwerty-device.json       # QWERTY physical key positions
-│   └── qwerty-semitones.json    # QWERTY finger → semitone
+├── audio-engine/                   # Rust/Tauri audio engine
+│   ├── src/
+│   │   ├── main.rs                # Tauri commands, entry point
+│   │   ├── lib.rs                 # Module exports
+│   │   └── audio/
+│   │       ├── engine.rs          # cpal audio engine, voice management
+│   │       ├── synth.rs           # Triangle wave synth with ADSR
+│   │       └── mod.rs             # Audio module exports
+│   ├── Cargo.toml
+│   └── tauri.conf.json
+│
+├── frontend/                       # React application
+│   ├── src/
+│   │   ├── renderer/
+│   │   │   ├── App.tsx            # Root component
+│   │   │   ├── main.tsx           # Entry point
+│   │   │   ├── audio/
+│   │   │   │   ├── AudioEngine.ts # Tauri IPC interface
+│   │   │   │   └── actions.ts    # Action executor
+│   │   │   ├── components/
+│   │   │   │   ├── AppUI.tsx
+│   │   │   │   ├── KeyboardHand.tsx
+│   │   │   │   ├── OctaveControl.tsx
+│   │   │   │   ├── KeyBindingTooltip.tsx
+│   │   │   │   ├── ActionsListModal.tsx
+│   │   │   │   ├── KeySelector.tsx
+│   │   │   │   ├── SettingsModal.tsx
+│   │   │   │   ├── Metronome.tsx
+│   │   │   │   └── TitleBar.tsx
+│   │   │   ├── keyboard/
+│   │   │   │   ├── layouts.ts
+│   │   │   │   └── keyBindings.ts
+│   │   │   ├── hooks/
+│   │   │   │   └── useKeyboardEvents.ts
+│   │   │   └── store/
+│   │   │       └── appStore.ts
+│   │   ├── shared/
+│   │   │   └── types.ts
+│   │   └── mappings/
+│   │       ├── actions.json
+│   │       ├── dvorak-device.json
+│   │       ├── dvorak-semitones.json
+│   │       ├── qwerty-device.json
+│   │       └── qwerty-semitones.json
+│   └── index.html
+│
 └── docs/
-    ├── bootstrap.md              # Getting started
-    ├── keymouse_device.md        # Hardware description
-    └── design/
-        └── instrument.md        # Instrument usage guide
 ```
 
 ## Key Modules
 
-### AudioEngine
+### Rust Audio Engine
 
-Singleton class wrapping Tone.js PolySynth:
-- 128-voice polyphony for chords
-- Per-voice ADSR envelope (attack: 0.01s, decay: 0.1s, sustain: 0.3, release: 0.5s)
-- Per-hand volume control
-- Note tracking for sustain pedal (panic)
-- Triangle wave oscillator
+Located in `audio-engine/src/audio/`:
 
-```typescript
-class AudioEngine {
-  private engine: Tone.PolySynth;
-  private leftHandNotes: Map<number, Note>;
-  private rightHandNotes: Map<number, Note>;
+**engine.rs** - Main audio engine using cpal:
+- Initializes cpal output stream with 128-sample buffer (low latency)
+- Command channel for receiving note commands from Tauri IPC
+- 128-voice polyphony per hand (256 total)
+- Real-time audio callback writes directly to DAC
 
-  triggerAttack(note: Note): void;
-  triggerRelease(note: Note): void;
-  setLeftHandVolume(db: number): void;
-  setRightHandVolume(db: number): void;
-  panic(): void;
-}
-```
+**synth.rs** - Voice synthesis:
+- Triangle wave oscillator with phase accumulation
+- ADSR envelope (Attack: 1ms, Decay: 100ms, Sustain: 70%, Release: 300ms)
+- Voice state machine: Off → Attack → Decay → Sustain → Release → Off
+
+### Frontend Audio Interface
+
+Located in `frontend/src/renderer/audio/AudioEngine.ts`:
+
+Thin wrapper exposing Tauri IPC commands:
+- `playNote(frequency, hand)` - Trigger note
+- `stopNote(frequency, hand)` - Release note
+- `setVolume(volume)` - Set master volume
+- `panic()` - Emergency stop
 
 ### Actions System
 
-Action definitions stored in `/mappings/actions.json` with categories:
-- **sound**: Trigger notes (indexed by finger position)
+Action definitions stored in `/mappings/actions.json`:
+- **sound**: Trigger notes per hand (12 notes per hand)
 - **octave**: Octave control per hand
 - **transport**: Play/pause/stop
 - **settings**: UI toggles
-
-Action executor (`actions.ts`) dispatches to AudioEngine or UI state.
 
 ### Keyboard Resolution
 
 Two-layer lookup for key events:
 
-1. **Layout Resolution** (`layouts.ts`): Determine active layout (DVORAK/QWERTY) from device or settings
-2. **Key Binding Lookup** (`keyBindings.ts`): Map device keycode → action
+1. **Layout Resolution** (`layouts.ts`): Determine active layout (DVORAK/QWERTY)
+2. **Key Binding Lookup** (`keyBindings.ts`): Map device key → action
 
-The key binding files are organized by:
-- `*-device.json`: Physical key positions by finger/row (which key produces which finger ID)
+Files:
+- `*-device.json`: Physical key positions by finger/row
 - `*-semitones.json`: Finger ID → semitone interval mapping
 
-This separation allows the same semitone logic to work across different keyboard layouts.
+### State Management
 
-### Main Process
-
-Electron main process handles:
-- Window creation and management
-- Application menu
-- IPC for native features
-- MIDI output (future)
-
-### Preload Script
-
-Secure bridge exposing limited APIs to renderer:
-- `window.api.send(channel, data)`
-- `window.api.on(channel, handler)`
+Zustand store (`frontend/src/renderer/store/appStore.ts`) owns all UI state. Rust has no duplicate state - all settings, octave values, and pressed keys are managed in React.
 
 ## Data Flow
 
@@ -116,47 +114,54 @@ Secure bridge exposing limited APIs to renderer:
 ```
 KeyDown Event
     ↓
-App.tsx handles event
+useKeyboardEvents.ts (hook)
     ↓
-keyBindings.ts resolves device key → action
+layouts.ts resolves key → action
     ↓
-actions.ts executes action
+calculateFrequency(semitone, octave, selectedKey)
     ↓
-AudioEngine.triggerAttack(note)
+AudioEngine.playNote(frequency, hand)
     ↓
-Tone.js synthesizes audio
+Tauri invoke (cmd_play_note_raw)
+    ↓
+Rust command thread receives command
+    ↓
+Audio thread processes (next buffer cycle)
+    ↓
+DAC outputs audio (~3ms total latency)
 ```
 
-### Configuration
+## Audio Thread Architecture
 
 ```
-User selects setting
-    ↓
-App.tsx updates state
-    ↓
-Components re-render with new context
-    ↓
-AudioEngine applies settings (volume, etc.)
+┌─────────────────────────────────────────┐
+│           Command Thread                 │
+│  (receives IPC, sends to audio thread)  │
+└─────────────────┬───────────────────────┘
+                  │ mpsc channel
+                  ▼
+┌─────────────────────────────────────────┐
+│           Audio Thread                  │
+│  (cpal callback, real-time priority)    │
+│                                          │
+│  For each buffer:                        │
+│    1. Check command channel             │
+│    2. Update voice states              │
+│    3. Mix voices to output buffer       │
+└─────────────────────────────────────────┘
 ```
-
-## MIDI Integration
-
-MIDI output is planned but not yet implemented. The architecture should support:
-- Sending note on/off via Web MIDI API
-- Configurable MIDI channel per hand
-- Pitch bend support for expression
 
 ## State Management
 
-React Context for global state:
-- `AudioContext`: AudioEngine instance
-- `KeyboardContext`: Layout, octave settings, active notes
-- `SettingsContext`: Volume, key selector, metronome
-
-Local component state for UI-only concerns (modal visibility, hover states).
+React Zustand store:
+- `keyboardLayout` - 'dvorak' | 'qwerty'
+- `leftOctave`, `rightOctave` - 1-8
+- `selectedKey` - 0-11 (C-B)
+- `volume` - in dB
+- `showSettings`, `showActions` - boolean
+- `audioReady` - boolean
+- `pressedKeys` - Set<string>
 
 ## Styling
 
-Global CSS with CSS custom properties for theming. Component-specific styles are colocated or in a single stylesheet depending on complexity.
-
-The keyboard hand uses CSS Grid for the 3×4 button layout, with responsive sizing based on viewport.
+CSS with custom properties for theming. Component styles colocated. Keyboard hand uses CSS Grid for 3×4 button layout.

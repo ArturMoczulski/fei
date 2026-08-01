@@ -2,80 +2,127 @@
 
 ## Overview
 
-Fei is an Electron application with a React renderer that uses Tone.js for audio synthesis. The application transforms a computer keyboard into a musical instrument with two independent hands, each controlling a separate pitch range.
+Fei is a platform-independent isomorphic keyboard instrument using Rust/Tauri for audio synthesis and React for UI. Audio runs in a native Rust thread via cpal, bypassing the webview entirely for low-latency performance.
 
 ## Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                      Main Process                            │
-│  src/main/index.ts - Electron window, IPC handlers          │
-│  src/main/preload.ts - Secure context bridge                │
+│                     Tauri Application                         │
+├─────────────────────────────────────────────────────────────┤
+│  ┌─────────────────────┐    ┌─────────────────────────────┐ │
+│  │   React Frontend    │    │   Rust Audio Engine        │ │
+│  │   (WebView/WKWebView)   │   │   (cpal + native thread)  │ │
+│  │                     │    │                             │ │
+│  │  ┌───────────────┐ │    │  ┌───────────────────────┐ │ │
+│  │  │  Zustand     │ │    │  │  Triangle Wave Synth  │ │ │
+│  │  │  Store       │ │    │  │  + ADSR Envelope      │ │ │
+│  │  └───────────────┘ │    │  │  (128 voices)         │ │ │
+│  │         │         │    │  └───────────────────────┘ │ │
+│  │         │ IPC     │    │            │               │ │
+│  │         ▼         │    │            ▼               │ │
+│  │  ┌───────────────┐ │    │  ┌───────────────────────┐ │ │
+│  │  │  AudioEngine │ │    │  │  cpal Output Stream   │ │ │
+│  │  │  (invoke)    │─┼────┼──│  (44.1kHz, 128 buf)   │ │ │
+│  │  └───────────────┘ │    │  └───────────────────────┘ │ │
+│  └─────────────────────┘    └─────────────────────────────┘ │
 └─────────────────────────────────────────────────────────────┘
                               │
-                              │ contextBridge (IPC)
                               ▼
-┌─────────────────────────────────────────────────────────────┐
-│                    Renderer Process                          │
-│                                                              │
-│  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐  │
-│  │  React UI    │    │ Audio Engine │    │   Store      │  │
-│  │  Components  │    │  (Tone.js)   │    │  (Zustand)   │  │
-│  └──────────────┘    └──────────────┘    └──────────────┘  │
-│          │                   │                   │           │
-│          └───────────────────┴───────────────────┘           │
-│                              │                                │
-│  ┌──────────────────────────────────────────────────────────┐│
-│  │              Keyboard Event Handler                       ││
-│  │  useKeyboardEvents.ts → layouts.ts → actions.ts         ││
-│  └──────────────────────────────────────────────────────────┘│
-└─────────────────────────────────────────────────────────────┘
+                    ┌─────────────────────┐
+                    │   System Audio      │
+                    │   (CoreAudio/ALSA)  │
+                    └─────────────────────┘
 ```
 
 ## Directory Structure
 
 ```
-src/
-├── main/
-│   ├── index.ts       # Electron main process entry point
-│   └── preload.ts     # Context bridge for secure IPC
-├── renderer/
-│   ├── App.tsx        # Root component, initializes audio
-│   ├── main.tsx       # React entry point
-│   ├── audio/
-│   │   ├── AudioEngine.ts         # Main Tone.js synth
-│   │   ├── MetronomeAudioEngine.ts# Metronome with Tone.Transport
-│   │   └── actions.ts             # Action execution logic
-│   ├── components/
-│   │   ├── AppUI.tsx              # Main layout container
-│   │   ├── KeyboardHand.tsx       # Hand panel with sound buttons
-│   │   ├── KeyBindingTooltip.tsx  # Key label overlay
-│   │   ├── KeySelector.tsx        # Transposition dropdown
-│   │   ├── Metronome.tsx          # Metronome controls
-│   │   ├── SettingsModal.tsx      # Settings panel
-│   │   ├── ActionsListModal.tsx   # All actions reference
-│   │   └── TitleBar.tsx           # Window title bar
-│   ├── keyboard/
-│   │   ├── layouts.ts      # Layout resolution, key→action mapping
-│   │   └── keyBindings.ts # Helpers for key/action lookup
-│   ├── hooks/
-│   │   └── useKeyboardEvents.ts  # Keyboard event handling hook
-│   └── store/
-│       └── appStore.ts    # Zustand global state
-└── shared/
-    └── types.ts           # Shared TypeScript types
+fei/
+├── audio-engine/           # Rust/Tauri audio engine
+│   ├── src/
+│   │   ├── main.rs        # Tauri commands, entry point
+│   │   ├── lib.rs         # Module exports
+│   │   └── audio/
+│   │       ├── engine.rs  # cpal audio engine, voice management
+│   │       ├── synth.rs   # Triangle wave synth with ADSR
+│   │       └── mod.rs     # Audio module exports
+│   ├── Cargo.toml
+│   └── tauri.conf.json
+│
+├── frontend/               # React frontend (self-contained)
+│   ├── src/
+│   │   ├── renderer/
+│   │   │   ├── App.tsx        # Root component
+│   │   │   ├── main.tsx       # React entry point
+│   │   │   ├── audio/
+│   │   │   │   ├── AudioEngine.ts     # Tauri IPC interface
+│   │   │   │   └── actions.ts         # Action execution
+│   │   │   ├── components/
+│   │   │   │   ├── AppUI.tsx          # Main layout
+│   │   │   │   ├── KeyboardHand.tsx   # Hand panel
+│   │   │   │   ├── KeyBindingTooltip.tsx
+│   │   │   │   ├── KeySelector.tsx
+│   │   │   │   ├── Metronome.tsx
+│   │   │   │   ├── SettingsModal.tsx
+│   │   │   │   ├── ActionsListModal.tsx
+│   │   │   │   └── TitleBar.tsx
+│   │   │   ├── keyboard/
+│   │   │   │   ├── layouts.ts     # Layout resolution
+│   │   │   │   └── keyBindings.ts
+│   │   │   ├── hooks/
+│   │   │   │   └── useKeyboardEvents.ts
+│   │   │   └── store/
+│   │   │       └── appStore.ts    # Zustand state
+│   │   ├── shared/
+│   │   │   └── types.ts
+│   │   └── mappings/              # Keyboard layout definitions
+│   │       ├── actions.json
+│   │       ├── dvorak-device.json
+│   │       ├── dvorak-semitones.json
+│   │       ├── qwerty-device.json
+│   │       └── qwerty-semitones.json
+│   ├── package.json
+│   ├── tsconfig.json
+│   ├── vite.config.ts
+│   └── index.html
+│
+├── docs/                   # Documentation
+└── SPEC.md                 # Project specification
 ```
 
 ## Key Modules
 
-### AudioEngine (`src/renderer/audio/AudioEngine.ts`)
+### Rust Audio Engine (`audio-engine/src/audio/engine.rs`)
 
-Singleton class wrapping Tone.js PolySynth. Manages two independent synths (left/right hand) with 128-voice polyphony each.
+Real-time audio synthesis using cpal with a dedicated audio thread:
 
-- `init()` - Initializes Tone.js context and creates synths
-- `playNote(frequency, hand)` - Triggers a note on the specified hand's synth
-- `stopNote(frequency, hand)` - Releases a specific note
-- `panic()` - Stops all notes and resets transport
+- `AudioEngine::init()` - Initializes cpal output stream
+- `AudioEngine::play_note(frequency, hand)` - Triggers a note
+- `AudioEngine::stop_note(frequency, hand)` - Releases a note
+- `AudioEngine::set_volume(volume)` - Sets master volume
+- `AudioEngine::panic()` - Stops all notes immediately
+
+Voice management:
+- 128-voice polyphony per hand (256 total)
+- Triangle wave oscillator with phase accumulation
+- ADSR envelope (Attack: 1ms, Decay: 100ms, Sustain: 70%, Release: 300ms)
+
+Command flow:
+```
+Frontend (invoke) → Tauri Command → Channel → Audio Thread → cpal buffer
+```
+
+### Frontend Audio Interface (`frontend/src/renderer/audio/AudioEngine.ts`)
+
+Thin wrapper around Tauri IPC commands:
+
+```typescript
+playNote(frequency: number, hand: 'left' | 'right')
+stopNote(frequency: number, hand: 'left' | 'right')
+setVolume(value: number)
+panic()
+```
 
 ### Keyboard Event Flow
 
@@ -84,69 +131,73 @@ KeyDown event
     ↓
 useKeyboardEvents.ts (hook)
     ↓
-layouts.ts → getLayout() builds KeyMapping[] for current keyboard layout
+layouts.ts → getLayout() builds KeyMapping[] for current layout
     ↓
 Find mapping where m.key === e.key.toLowerCase()
     ↓
-If sound action: calculateFrequency() → audioEngine.playNote()
-If octave action: update store
-If settings action: toggle modal
+calculateFrequency(semitone, octave, selectedKey) → audioEngine.playNote()
 ```
 
-### Layout Resolution (`src/renderer/keyboard/layouts.ts`)
+### State Management (`frontend/src/renderer/store/appStore.ts`)
 
-The `getLayout()` function builds a complete key mapping by combining two JSON files:
+Zustand store owning all UI state (Rust has no duplicate state):
 
-1. `*-device.json` - Physical key positions (which key produces which action)
-2. `*-semitones.json` - Semitone intervals for each action
-
-This separation allows the same note logic to work across different keyboard layouts (DVORAK/QWERTY).
-
-### State Management (`src/renderer/store/appStore.ts`)
-
-Zustand store holding:
 - `keyboardLayout` - Current layout ('dvorak' | 'qwerty')
 - `leftOctave`, `rightOctave` - Per-hand octave (1-8)
 - `selectedKey` - Transposition key (0-11 for C-B)
 - `volume` - Master volume in dB
 - `showSettings`, `showActions` - Modal visibility
-- `audioReady` - Whether Tone.js is initialized
+- `audioReady` - Whether audio engine is initialized
 - `pressedKeys` - Currently held keys
 
-Settings are persisted to electron-store via IPC.
+## Tauri IPC Commands
 
-### Metronome (`src/renderer/audio/MetronomeAudioEngine.ts`)
-
-Uses Tone.js Transport for timing. Creates a Sequence that triggers click sounds on each beat. Accent on beat 1, normal click on other beats.
-
-## Key Mappings
-
-Actions are defined in `mappings/actions.json` with categories:
-- `left_sound` / `right_sound` - 12 notes per hand
-- `octave` - 4 actions (increase/decrease per hand)
-- `transport` - panic_stop, toggle_metronome
-- `settings` - open_settings, toggle_actions_list
+| Command | Parameters | Description |
+|---------|------------|-------------|
+| `cmd_init_audio` | - | Initialize audio engine |
+| `cmd_play_note` | semitone, octave, hand, selected_key | Calculate freq and play |
+| `cmd_play_note_raw` | frequency, hand | Play with precalculated freq |
+| `cmd_stop_note` | semitone, octave, hand, selected_key | Calculate freq and stop |
+| `cmd_stop_note_raw` | frequency, hand | Stop with precalculated freq |
+| `cmd_stop_all` | - | Stop all notes |
+| `cmd_panic` | - | Emergency stop all |
+| `cmd_set_volume` | volume | Set master volume |
+| `cmd_get_volume` | - | Get current volume |
+| `cmd_is_audio_ready` | - | Check if audio initialized |
 
 ## Note Calculation
 
-```
+```typescript
 MIDI = (octave + 1) * 12 + noteIndex
 Frequency = 440 × 2^((MIDI - 69) / 12)
 ```
 
 Where `noteIndex` is derived from `selectedKey + semitone` (mod 12).
 
-## Electron IPC
+## Key Mappings
 
-Main process exposes two namespaces via preload:
+Actions defined in `mappings/actions.json`:
+- `left_sound` / `right_sound` - 12 notes per hand
+- `octave` - 4 actions (increase/decrease per hand)
+- `transport` - panic_stop, toggle_metronome
+- `settings` - open_settings, toggle_actions_list
 
-- `window.electronAPI.window` - minimize, maximize, close, isMaximized
-- `window.electronAPI.settings` - get, set, getAll (backed by electron-store)
+## Latency Characteristics
 
-## UI Components
+- Buffer size: 128 samples (2.9ms at 44.1kHz)
+- IPC overhead: ~0.5-1ms (Tauri invoke)
+- Audio thread command processing: ~0.1ms
+- Total key-to-sound: ~3-5ms perceived latency
 
-The main UI is composed in `AppUI.tsx`:
-- Two `KeyboardHand` components (left/right) showing the 3×4 button grid
-- Each button displays: note name, interval (+N), frequency (Hz), key binding
-- Footer contains KeySelector, Metronome, and volume control
-- Modals for Settings and ActionsList
+## Building and Running
+
+```bash
+# Build frontend
+cd frontend && npm run build
+
+# Build audio engine (Rust/Tauri)
+cd audio-engine && cargo build
+
+# Run in development
+cd audio-engine && cargo run
+```
