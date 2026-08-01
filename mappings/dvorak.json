@@ -1,0 +1,32 @@
+{
+  "name": "DVORAK",
+  "description": "KeyMouse Dvorak layout - right: GCRL/HTNS/MWVZ, left: P.,Q/JQ/; - mirror reflection",
+  "rightHand": [
+    { "key": "g", "semitone": 11 },
+    { "key": "c", "semitone": 10 },
+    { "key": "r", "semitone": 9 },
+    { "key": "l", "semitone": 8 },
+    { "key": "h", "semitone": 7 },
+    { "key": "t", "semitone": 6 },
+    { "key": "n", "semitone": 5 },
+    { "key": "s", "semitone": 4 },
+    { "key": "m", "semitone": 3 },
+    { "key": "w", "semitone": 2 },
+    { "key": "v", "semitone": 1 },
+    { "key": "z", "semitone": 0 }
+  ],
+  "leftHand": [
+    { "key": "p", "semitone": 11 },
+    { "key": ".", "semitone": 10 },
+    { "key": ",", "semitone": 9 },
+    { "key": "'", "semitone": 8 },
+    { "key": "u", "semitone": 7 },
+    { "key": "e", "semitone": 6 },
+    { "key": "o", "semitone": 5 },
+    { "key": "a", "semitone": 4 },
+    { "key": ";", "semitone": 3 },
+    { "key": "q", "semitone": 2 },
+    { "key": "j", "semitone": 1 },
+    { "key": "k", "semitone": 0 }
+  ]
+}
