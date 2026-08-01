@@ -2,8 +2,8 @@
   "name": "Fei Actions",
   "description": "All available actions in the Fei application",
   "categories": {
-    "sound": {
-      "description": "Sound buttons - trigger musical notes",
+    "left_sound": {
+      "description": "Left hand sound buttons - trigger musical notes",
       "actions": [
         "left_hand_sound_upper_pinky",
         "left_hand_sound_upper_ring",
@@ -16,7 +16,12 @@
         "left_hand_sound_lower_pinky",
         "left_hand_sound_lower_ring",
         "left_hand_sound_lower_middle",
-        "left_hand_sound_lower_index",
+        "left_hand_sound_lower_index"
+      ]
+    },
+    "right_sound": {
+      "description": "Right hand sound buttons - trigger musical notes",
+      "actions": [
         "right_hand_sound_upper_index",
         "right_hand_sound_upper_middle",
         "right_hand_sound_upper_ring",
@@ -50,7 +55,8 @@
     "settings": {
       "description": "Settings controls",
       "actions": [
-        "open_settings"
+        "open_settings",
+        "toggle_actions_list"
       ]
     }
   }

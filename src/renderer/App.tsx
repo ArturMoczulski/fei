@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import TitleBar from './components/TitleBar';
 import KeyboardHand from './components/KeyboardHand';
 import SettingsModal from './components/SettingsModal';
+import { ActionsListModal } from './components/ActionsListModal';
 import KeySelector from './components/KeySelector';
 import Metronome from './components/Metronome';
 import { KeyBindingTooltip } from './components/KeyBindingTooltip';
@@ -22,6 +23,7 @@ function App() {
   const [selectedKey, setSelectedKey] = useState(DEFAULT_KEY);
   const [pressedKeys, setPressedKeys] = useState<Set<string>>(new Set());
   const [showSettings, setShowSettings] = useState(false);
+  const [showActions, setShowActions] = useState(false);
   const [audioReady, setAudioReady] = useState(false);
   const [activeFrequencies] = useState<Map<string, number>>(new Map());
   const isInitialKeyChange = useRef(true);
@@ -85,16 +87,22 @@ function App() {
 
   const handleKeyDown = useCallback(async (e: KeyboardEvent) => {
     if (e.repeat) return;
+
+    const key = e.key.toLowerCase();
+    const layout = getLayout(keyboardLayout);
+    const mapping = layout.find((m: KeyMapping) => m.key === key);
+
+    if (mapping && mapping.action === 'toggle_actions_list') {
+      setShowActions(prev => !prev);
+      return;
+    }
+
     if (showSettings) return;
 
     if (!audioReady) {
       await initAudio();
       setAudioReady(true);
     }
-
-    const key = e.key.toLowerCase();
-    const layout = getLayout(keyboardLayout);
-    const mapping = layout.find((m: KeyMapping) => m.key === key);
 
     if (mapping) {
       setPressedKeys(prev => new Set(prev).add(key));
@@ -118,9 +126,11 @@ function App() {
         if (rightOctave < 8) handleRightOctaveChange(rightOctave + 1);
       } else if (mapping.action === 'right_hand_decrease_octave') {
         if (rightOctave > 1) handleRightOctaveChange(rightOctave - 1);
+      } else if (mapping.action === 'toggle_actions_list') {
+        setShowActions(prev => !prev);
       }
     }
-  }, [keyboardLayout, leftOctave, rightOctave, selectedKey, audioReady, showSettings, initAudio, activeFrequencies, handleLeftOctaveChange, handleRightOctaveChange]);
+  }, [keyboardLayout, leftOctave, rightOctave, selectedKey, audioReady, showSettings, initAudio, activeFrequencies, handleLeftOctaveChange, handleRightOctaveChange, showActions]);
 
   const handleKeyUp = useCallback((e: KeyboardEvent) => {
     const key = e.key.toLowerCase();
@@ -207,7 +217,7 @@ function App() {
 
   return (
     <div className="app">
-      <TitleBar onSettingsClick={() => setShowSettings(true)} keyboardLayout={keyboardLayout} />
+      <TitleBar onSettingsClick={() => setShowSettings(true)} onActionsClick={() => setShowActions(true)} keyboardLayout={keyboardLayout} />
 
       <div className="main-content">
         <div className="hands-container">
@@ -276,6 +286,13 @@ function App() {
           onLayoutChange={handleLayoutChange}
           onVolumeChange={handleVolumeChange}
           onClose={() => setShowSettings(false)}
+        />
+      )}
+
+      {showActions && (
+        <ActionsListModal
+          keyboardLayout={keyboardLayout}
+          onClose={() => setShowActions(false)}
         />
       )}
     </div>
