@@ -34,6 +34,8 @@ export interface KeyMapping {
   key: string;
   semitone: number;
   hand: 'left' | 'right';
+  row?: 'upper' | 'home' | 'lower';
+  fingerId?: string;
 }
 
 declare global {

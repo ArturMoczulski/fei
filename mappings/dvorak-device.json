@@ -1,0 +1,44 @@
+{
+  "name": "DVORAK",
+  "description": "KeyMouse Dvorak layout physical key positions",
+  "leftHand": {
+    "upper": [
+      { "id": "upper_pinky", "key": "'" },
+      { "id": "upper_ring", "key": "," },
+      { "id": "upper_middle", "key": "." },
+      { "id": "upper_index", "key": "p" }
+    ],
+    "home": [
+      { "id": "home_pinky", "key": "a" },
+      { "id": "home_ring", "key": "o" },
+      { "id": "home_middle", "key": "e" },
+      { "id": "home_index", "key": "u" }
+    ],
+    "lower": [
+      { "id": "lower_pinky", "key": ";" },
+      { "id": "lower_ring", "key": "q" },
+      { "id": "lower_middle", "key": "j" },
+      { "id": "lower_index", "key": "k" }
+    ]
+  },
+  "rightHand": {
+    "upper": [
+      { "id": "upper_index", "key": "g" },
+      { "id": "upper_middle", "key": "c" },
+      { "id": "upper_ring", "key": "r" },
+      { "id": "upper_pinky", "key": "l" }
+    ],
+    "home": [
+      { "id": "home_index", "key": "h" },
+      { "id": "home_middle", "key": "t" },
+      { "id": "home_ring", "key": "n" },
+      { "id": "home_pinky", "key": "s" }
+    ],
+    "lower": [
+      { "id": "lower_index", "key": "m" },
+      { "id": "lower_middle", "key": "w" },
+      { "id": "lower_ring", "key": "v" },
+      { "id": "lower_pinky", "key": "z" }
+    ]
+  }
+}

@@ -1,13 +1,10 @@
-import type { KeyboardLayout, KeyMapping, KeyboardMapping } from '@shared/types';
-import qwertyMapping from '../../../mappings/qwerty.json';
-import dvorakMapping from '../../../mappings/dvorak.json';
+import type { KeyboardLayout, KeyMapping } from '@shared/types';
+import qwertyDevice from '../../../mappings/qwerty-device.json';
+import qwertySemitones from '../../../mappings/qwerty-semitones.json';
+import dvorakDevice from '../../../mappings/dvorak-device.json';
+import dvorakSemitones from '../../../mappings/dvorak-semitones.json';
 
 const NOTES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-
-const mappings: Record<KeyboardLayout, KeyboardMapping> = {
-  qwerty: qwertyMapping as KeyboardMapping,
-  dvorak: dvorakMapping as KeyboardMapping,
-};
 
 export function getNoteWithOctave(baseNote: string, octave: number): { note: string; octave: number; frequency: number } {
   const noteIndex = NOTES.indexOf(baseNote);
@@ -26,16 +23,28 @@ export function isBlackKey(note: string): boolean {
 }
 
 export function getLayout(type: KeyboardLayout): KeyMapping[] {
-  const mapping = mappings[type];
+  const device = type === 'dvorak' ? dvorakDevice : qwertyDevice;
+  const semitones = type === 'dvorak' ? dvorakSemitones : qwertySemitones;
   const result: KeyMapping[] = [];
 
-  mapping.rightHand.forEach(entry => {
-    result.push({ key: entry.key, semitone: entry.semitone, hand: 'right' });
-  });
+  const rows = ['upper', 'home', 'lower'] as const;
 
-  mapping.leftHand.forEach(entry => {
-    result.push({ key: entry.key, semitone: entry.semitone, hand: 'left' });
-  });
+  for (const hand of ['leftHand', 'rightHand'] as const) {
+    const handData = device[hand];
+    for (const row of rows) {
+      const rowKeys = handData[row];
+      for (const keyData of rowKeys) {
+        const semitone = semitones[hand][keyData.id];
+        result.push({
+          key: keyData.key,
+          semitone,
+          hand: hand === 'leftHand' ? 'left' : 'right',
+          row,
+          fingerId: keyData.id,
+        });
+      }
+    }
+  }
 
   return result;
 }

@@ -1,0 +1,44 @@
+{
+  "name": "QWERTY",
+  "description": "Standard QWERTY keyboard physical key positions",
+  "leftHand": {
+    "upper": [
+      { "id": "upper_pinky", "key": "q" },
+      { "id": "upper_ring", "key": "w" },
+      { "id": "upper_middle", "key": "e" },
+      { "id": "upper_index", "key": "r" }
+    ],
+    "home": [
+      { "id": "home_pinky", "key": "a" },
+      { "id": "home_ring", "key": "s" },
+      { "id": "home_middle", "key": "d" },
+      { "id": "home_index", "key": "f" }
+    ],
+    "lower": [
+      { "id": "lower_pinky", "key": "z" },
+      { "id": "lower_ring", "key": "x" },
+      { "id": "lower_middle", "key": "c" },
+      { "id": "lower_index", "key": "v" }
+    ]
+  },
+  "rightHand": {
+    "upper": [
+      { "id": "upper_index", "key": "u" },
+      { "id": "upper_middle", "key": "i" },
+      { "id": "upper_ring", "key": "o" },
+      { "id": "upper_pinky", "key": "p" }
+    ],
+    "home": [
+      { "id": "home_index", "key": "j" },
+      { "id": "home_middle", "key": "k" },
+      { "id": "home_ring", "key": "l" },
+      { "id": "home_pinky", "key": ";" }
+    ],
+    "lower": [
+      { "id": "lower_index", "key": "m" },
+      { "id": "lower_middle", "key": "," },
+      { "id": "lower_ring", "key": "." },
+      { "id": "lower_pinky", "key": "/" }
+    ]
+  }
+}

@@ -406,7 +406,7 @@ body {
 .key-selector {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
 }
 
 .key-selector-label {
@@ -414,33 +414,91 @@ body {
   color: var(--text-muted);
 }
 
-.key-selector-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  max-width: 400px;
-}
-
-.key-selector-btn {
-  width: 44px;
-  height: 36px;
+.key-selector-dropdown {
+  padding: 10px 16px;
   border-radius: 6px;
   border: 1px solid var(--border);
   background: var(--surface);
-  color: var(--text-muted);
-  cursor: pointer;
+  color: var(--text);
   font-family: 'JetBrains Mono', monospace;
-  font-size: 13px;
+  font-size: 14px;
+  cursor: pointer;
+  outline: none;
+  min-width: 70px;
+}
+
+.key-selector-dropdown:hover,
+.key-selector-dropdown:focus {
+  border-color: var(--primary);
+}
+
+.metronome {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.metronome-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transition: all 0.15s ease;
 }
 
-.key-selector-btn:hover {
+.metronome-btn:hover {
   background: var(--surface-hover);
-  color: var(--text);
+  border-color: var(--primary);
 }
 
-.key-selector-btn.selected {
+.metronome-btn.running {
   background: var(--primary);
   border-color: var(--primary);
   color: white;
+}
+
+.metronome-preset-select {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  cursor: pointer;
+  outline: none;
+}
+
+.metronome-preset-select:hover,
+.metronome-preset-select:focus {
+  border-color: var(--primary);
+}
+
+.metronome-bpm-input {
+  width: 60px;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  text-align: center;
+  outline: none;
+}
+
+.metronome-bpm-input:focus {
+  border-color: var(--primary);
+}
+
+.metronome-bpm-label {
+  font-size: 12px;
+  color: var(--text-muted);
 }

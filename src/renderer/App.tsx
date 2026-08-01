@@ -3,6 +3,7 @@ import TitleBar from './components/TitleBar';
 import KeyboardHand from './components/KeyboardHand';
 import SettingsModal from './components/SettingsModal';
 import KeySelector from './components/KeySelector';
+import Metronome from './components/Metronome';
 import { audioEngine } from './audio/AudioEngine';
 import { getLayout, getKeyDisplayKey, semitoneToNote } from './keyboard/layouts';
 import type { KeyboardLayout, KeyMapping } from '@shared/types';
@@ -188,6 +189,8 @@ function App() {
 
       <div className="footer">
         <KeySelector selectedKey={selectedKey} onKeyChange={handleKeyChange} />
+
+        <Metronome visible={true} />
 
         <div className="settings-row">
           <span className="settings-label">Volume:</span>
