@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { metronomeAudioEngine } from '../audio/MetronomeAudioEngine';
+import { metronomeAudioEngine, TimeSignature } from '../audio/MetronomeAudioEngine';
 
 interface MetronomeProps {
   visible: boolean;
@@ -15,9 +15,21 @@ const TEMPO_PRESETS = [
   { label: 'Prestissimo', value: 180 },
 ];
 
+const TIME_SIGNATURES: TimeSignature[] = [
+  { numerator: 2, denominator: 4 },
+  { numerator: 3, denominator: 4 },
+  { numerator: 4, denominator: 4 },
+  { numerator: 5, denominator: 4 },
+  { numerator: 6, denominator: 8 },
+  { numerator: 7, denominator: 8 },
+  { numerator: 9, denominator: 8 },
+  { numerator: 12, denominator: 8 },
+];
+
 function Metronome({ visible }: MetronomeProps) {
   const [isRunning, setIsRunning] = useState(false);
   const [bpm, setBpm] = useState(120);
+  const [timeSignature, setTimeSignature] = useState<TimeSignature>({ numerator: 4, denominator: 4 });
 
   useEffect(() => {
     metronomeAudioEngine.init();
@@ -29,7 +41,7 @@ function Metronome({ visible }: MetronomeProps) {
       metronomeAudioEngine.stop();
       setIsRunning(false);
     } else {
-      metronomeAudioEngine.start(bpm);
+      metronomeAudioEngine.start(bpm, timeSignature);
       setIsRunning(true);
     }
   };
@@ -40,7 +52,7 @@ function Metronome({ visible }: MetronomeProps) {
     metronomeAudioEngine.setBpm(newBpm);
     if (isRunning) {
       metronomeAudioEngine.stop();
-      metronomeAudioEngine.start(newBpm);
+      metronomeAudioEngine.start(newBpm, timeSignature);
     }
   };
 
@@ -48,6 +60,13 @@ function Metronome({ visible }: MetronomeProps) {
     const newBpm = Math.min(240, Math.max(20, Number(e.target.value)));
     setBpm(newBpm);
     metronomeAudioEngine.setBpm(newBpm);
+  };
+
+  const handleTimeSignatureChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const [num, denom] = e.target.value.split('/').map(Number);
+    const newTimeSignature: TimeSignature = { numerator: num, denominator: denom };
+    setTimeSignature(newTimeSignature);
+    metronomeAudioEngine.setTimeSignature(newTimeSignature);
   };
 
   if (!visible) return null;
@@ -83,6 +102,18 @@ function Metronome({ visible }: MetronomeProps) {
         max={240}
       />
       <span className="metronome-bpm-label">BPM</span>
+
+      <select
+        className="metronome-time-signature-select"
+        value={`${timeSignature.numerator}/${timeSignature.denominator}`}
+        onChange={handleTimeSignatureChange}
+      >
+        {TIME_SIGNATURES.map(ts => (
+          <option key={`${ts.numerator}/${ts.denominator}`} value={`${ts.numerator}/${ts.denominator}`}>
+            {ts.numerator}/{ts.denominator}
+          </option>
+        ))}
+      </select>
     </div>
   );
 }

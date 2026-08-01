@@ -1,11 +1,17 @@
 import * as Tone from 'tone';
 
+export type TimeSignature = {
+  numerator: number;
+  denominator: number;
+};
+
 class MetronomeAudioEngine {
   private clickSynth: Tone.Synth | null = null;
   private accentSynth: Tone.Synth | null = null;
   private sequence: Tone.Sequence | null = null;
   private isRunning: boolean = false;
   private bpm: number = 120;
+  private timeSignature: TimeSignature = { numerator: 4, denominator: 4 };
   private currentBeat: number = 0;
 
   async init(): Promise<void> {
@@ -24,12 +30,19 @@ class MetronomeAudioEngine {
     this.accentSynth.volume.value = -5;
   }
 
-  start(bpm: number): void {
+  start(bpm: number, timeSignature?: TimeSignature): void {
     if (this.isRunning) return;
-    this.bpm = bpm;
+    this.bpm = Math.max(20, bpm);
+    if (timeSignature) {
+      this.timeSignature = timeSignature;
+    }
     this.currentBeat = 0;
 
-    Tone.Transport.bpm.value = bpm;
+    Tone.Transport.stop();
+    Tone.Transport.cancel();
+    Tone.Transport.bpm.value = this.bpm;
+
+    const beats = Array.from({ length: this.timeSignature.numerator }, (_, i) => i);
 
     this.sequence = new Tone.Sequence(
       (time, beat) => {
@@ -39,7 +52,7 @@ class MetronomeAudioEngine {
           this.clickSynth?.triggerAttackRelease('C4', '32n', time);
         }
       },
-      [0, 1, 2, 3],
+      beats,
       '16n'
     );
 
@@ -66,8 +79,20 @@ class MetronomeAudioEngine {
     Tone.Transport.bpm.value = bpm;
   }
 
+  setTimeSignature(timeSignature: TimeSignature): void {
+    this.timeSignature = timeSignature;
+    if (this.isRunning) {
+      this.stop();
+      this.start(this.bpm, this.timeSignature);
+    }
+  }
+
   getBpm(): number {
     return this.bpm;
+  }
+
+  getTimeSignature(): TimeSignature {
+    return this.timeSignature;
   }
 
   getIsRunning(): boolean {
