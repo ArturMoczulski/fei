@@ -46,12 +46,6 @@ function Metronome({ visible }: MetronomeProps) {
     }
   };
 
-  const getClosestPreset = (bpmValue: number): number => {
-    return TEMPO_PRESETS.reduce((closest, preset) => {
-      return Math.abs(preset.value - bpmValue) < Math.abs(closest - bpmValue) ? preset.value : closest;
-    });
-  };
-
   const handleTempoChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newBpm = Number(e.target.value);
     setBpm(newBpm);
@@ -93,7 +87,7 @@ function Metronome({ visible }: MetronomeProps) {
 
       <select
         className="metronome-preset-select"
-        value={getClosestPreset(bpm)}
+        value={bpm}
         onChange={handleTempoChange}
       >
         {TEMPO_PRESETS.map(preset => (
