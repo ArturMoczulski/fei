@@ -8,7 +8,6 @@ function App() {
   useKeyboardEvents();
 
   useEffect(() => {
-    useAppStore.getState().loadSettings();
     audioEngine.init().then(() => {
       useAppStore.getState().setAudioReady(true);
     });

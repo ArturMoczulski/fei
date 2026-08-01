@@ -1,8 +1,8 @@
 import type { KeyboardLayout, KeyMapping } from '@shared/types';
-import qwertyDevice from '../../../mappings/qwerty-device.json';
-import qwertySemitones from '../../../mappings/qwerty-semitones.json';
-import dvorakDevice from '../../../mappings/dvorak-device.json';
-import dvorakSemitones from '../../../mappings/dvorak-semitones.json';
+import qwertyDevice from '../../mappings/qwerty-device.json';
+import qwertySemitones from '../../mappings/qwerty-semitones.json';
+import dvorakDevice from '../../mappings/dvorak-device.json';
+import dvorakSemitones from '../../mappings/dvorak-semitones.json';
 
 const NOTES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 
@@ -32,11 +32,12 @@ export function getLayout(type: KeyboardLayout): KeyMapping[] {
   for (const hand of ['leftHand', 'rightHand'] as const) {
     const handData = device[hand];
     const handName = hand === 'leftHand' ? 'leftHand' : 'rightHand';
+    const semitoneMap = semitones[handName as keyof typeof semitones] as Record<string, number>;
 
     for (const row of rows) {
       const rowKeys = handData.soundButtons[row];
       for (const keyData of rowKeys) {
-        const semitone = semitones[handName][keyData.action];
+        const semitone = semitoneMap[keyData.action];
         result.push({
           key: keyData.key,
           semitone,
@@ -55,7 +56,7 @@ export function getLayout(type: KeyboardLayout): KeyMapping[] {
           key: keyData.key,
           semitone: 0,
           hand: hand === 'leftHand' ? 'left' : 'right',
-          row: btn,
+          row: btn as 'upper' | 'home' | 'lower',
           action: keyData.action,
         });
       }

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useAppStore } from '../store/appStore';
 import { getKeyBindingForAction } from '../keyboard/keyBindings';
-import actions from '../../../mappings/actions.json';
+import actions from '../../mappings/actions.json';
 
 function ActionsListModal() {
   const keyboardLayout = useAppStore(state => state.keyboardLayout);
