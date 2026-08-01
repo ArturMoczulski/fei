@@ -9,9 +9,14 @@ class AudioEngine {
   async init(): Promise<void> {
     if (this.initialized) return;
 
+    console.log('[AudioEngine] Initializing...');
+    const startTime = performance.now();
+
     await Tone.start();
 
     Tone.context.lookAhead = 0;
+
+    console.log('[AudioEngine] Tone.start completed, creating synths...');
 
     const leftSynth = new Tone.PolySynth(Tone.Synth, {
       oscillator: { type: 'triangle' },
@@ -44,14 +49,21 @@ class AudioEngine {
     this.activeNotes.set('right', new Set());
 
     this.initialized = true;
+    const endTime = performance.now();
+    console.log(`[AudioEngine] Initialization complete in ${endTime - startTime}ms`);
   }
 
   playNote(frequency: number, hand: 'left' | 'right'): void {
-    if (!this.initialized) return;
+    if (!this.initialized) {
+      console.log('[AudioEngine] playNote called but not initialized');
+      return;
+    }
 
     const synth = this.synths.get(hand);
     const notes = this.activeNotes.get(hand);
     if (!synth || !notes) return;
+
+    console.log(`[AudioEngine] playNote: ${frequency}Hz, hand: ${hand}`);
 
     if (notes.has(frequency)) {
       synth.triggerRelease(frequency);
