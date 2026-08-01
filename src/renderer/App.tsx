@@ -90,10 +90,15 @@ function App() {
 
     const key = e.key.toLowerCase();
     const layout = getLayout(keyboardLayout);
-    const mapping = layout.find((m: KeyMapping) => m.key === key);
+    const mapping = layout.find((m: KeyMapping) => m.key.toLowerCase() === key);
 
     if (mapping && mapping.action === 'toggle_actions_list') {
       setShowActions(prev => !prev);
+      return;
+    }
+
+    if (mapping && mapping.action === 'open_settings') {
+      setShowSettings(prev => !prev);
       return;
     }
 
@@ -262,16 +267,6 @@ function App() {
             <span style={{ fontSize: '12px', minWidth: '30px' }}>{volume}dB</span>
           </div>
         </div>
-
-        <KeyBindingTooltip actions={['panic_stop']} keyboardLayout={keyboardLayout}>
-          <button
-            className="panic-btn"
-            onClick={() => audioEngine.panic()}
-            title="Stop all sounds"
-          >
-            ■
-          </button>
-        </KeyBindingTooltip>
       </div>
 
       <div className="status-bar">
@@ -285,6 +280,7 @@ function App() {
           volume={volume}
           onLayoutChange={handleLayoutChange}
           onVolumeChange={handleVolumeChange}
+          onPanic={() => audioEngine.panic()}
           onClose={() => setShowSettings(false)}
         />
       )}

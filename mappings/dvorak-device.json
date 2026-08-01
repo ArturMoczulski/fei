@@ -55,7 +55,7 @@
   },
   "global": {
     "settings": [
-      { "key": "o", "action": "open_settings" },
+      { "key": "Escape", "action": "open_settings" },
       { "key": "]", "action": "toggle_actions_list" }
     ],
     "playback": [

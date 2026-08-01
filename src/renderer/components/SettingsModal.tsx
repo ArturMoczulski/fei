@@ -6,6 +6,7 @@ interface SettingsModalProps {
   volume: number;
   onLayoutChange: (layout: KeyboardLayout) => void;
   onVolumeChange: (volume: number) => void;
+  onPanic: () => void;
   onClose: () => void;
 }
 
@@ -14,6 +15,7 @@ function SettingsModal({
   volume,
   onLayoutChange,
   onVolumeChange,
+  onPanic,
   onClose,
 }: SettingsModalProps) {
   return (
@@ -51,6 +53,12 @@ function SettingsModal({
               />
               <span style={{ fontSize: '12px', minWidth: '40px' }}>{volume}dB</span>
             </div>
+          </div>
+          <div className="modal-row">
+            <span>Panic (Stop All)</span>
+            <button className="panic-settings-btn" onClick={onPanic}>
+              ■
+            </button>
           </div>
         </div>
 
