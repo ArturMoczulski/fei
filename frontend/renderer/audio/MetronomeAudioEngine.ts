@@ -38,19 +38,19 @@ class MetronomeAudioEngine {
     }
   }
 
-  setBpm(bpm: number): void {
-    this.bpm = Math.max(0.1, bpm);
+  async setBpm(bpm: number): Promise<void> {
+    this.bpm = Math.max(20, bpm);
     if (this.isRunning) {
       this.stop();
-      this.start(this.bpm, this.timeSignature);
+      await this.start(this.bpm, this.timeSignature);
     }
   }
 
-  setTimeSignature(timeSignature: TimeSignature): void {
+  async setTimeSignature(timeSignature: TimeSignature): Promise<void> {
     this.timeSignature = timeSignature;
     if (this.isRunning) {
       this.stop();
-      this.start(this.bpm, this.timeSignature);
+      await this.start(this.bpm, this.timeSignature);
     }
   }
 

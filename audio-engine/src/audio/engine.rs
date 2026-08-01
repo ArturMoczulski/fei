@@ -284,6 +284,9 @@ impl AudioEngine {
 
         std::thread::spawn(move || {
             loop {
+                if !running_flag.load(Ordering::SeqCst) {
+                    break;
+                }
                 std::thread::sleep(Duration::from_millis(interval_ms));
                 if !running_flag.load(Ordering::SeqCst) {
                     break;
@@ -364,5 +367,50 @@ mod tests {
     fn test_metronome_stop_flag_initial_state() {
         let engine = AudioEngine::new();
         assert!(!engine.is_initialized());
+    }
+
+    #[test]
+    fn test_metronome_start_sets_running_flag() {
+        let mut engine = AudioEngine::new();
+        engine.initialized.store(true, Ordering::SeqCst);
+        let (tx, _rx) = std::sync::mpsc::channel();
+        engine.command_tx = Some(tx);
+        engine.metronome_start(120);
+        assert!(engine.metronome_running.load(Ordering::SeqCst));
+        engine.metronome_stop();
+        assert!(!engine.metronome_running.load(Ordering::SeqCst));
+    }
+
+    #[test]
+    fn test_metronome_start_when_already_running_returns_early() {
+        let mut engine = AudioEngine::new();
+        engine.initialized.store(true, Ordering::SeqCst);
+        let (tx, _rx) = std::sync::mpsc::channel();
+        engine.command_tx = Some(tx);
+        engine.metronome_start(120);
+        assert!(engine.metronome_running.load(Ordering::SeqCst));
+        engine.metronome_start(60);
+        assert!(engine.metronome_running.load(Ordering::SeqCst));
+        engine.metronome_stop();
+    }
+
+    #[test]
+    fn test_metronome_stop_prevents_ticks() {
+        let mut engine = AudioEngine::new();
+        engine.initialized.store(true, Ordering::SeqCst);
+        let (tx, rx) = std::sync::mpsc::channel();
+        let original_tx = engine.command_tx.take();
+        engine.command_tx = Some(tx);
+
+        engine.metronome_start(600);
+        std::thread::sleep(Duration::from_millis(50));
+        engine.metronome_stop();
+        std::thread::sleep(Duration::from_millis(50));
+
+        engine.command_tx = original_tx;
+
+        if let Ok(AudioCommand::MetronomeTick { .. }) = rx.try_recv() {
+            panic!("Expected no ticks after stop");
+        }
     }
 }

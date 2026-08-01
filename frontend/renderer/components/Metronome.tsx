@@ -46,36 +46,23 @@ function Metronome({ visible }: MetronomeProps) {
     }
   };
 
-  const handleTempoChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleTempoChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newBpm = Number(e.target.value);
     setBpm(newBpm);
-    metronomeAudioEngine.setBpm(newBpm);
-    if (isRunning) {
-      metronomeAudioEngine.stop();
-      metronomeAudioEngine.start(newBpm, timeSignature);
-    }
+    await metronomeAudioEngine.setBpm(newBpm);
   };
 
-  const handleBpmInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleBpmInput = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const newBpm = Math.min(240, Math.max(20, Number(e.target.value)));
     setBpm(newBpm);
-    metronomeAudioEngine.setBpm(newBpm);
-    if (isRunning) {
-      metronomeAudioEngine.stop();
-      metronomeAudioEngine.start(newBpm, timeSignature);
-    }
+    await metronomeAudioEngine.setBpm(newBpm);
   };
 
-  const syncBpm = (newBpm: number) => {
-    setBpm(newBpm);
-    metronomeAudioEngine.setBpm(newBpm);
-  };
-
-  const handleTimeSignatureChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleTimeSignatureChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
     const [num, denom] = e.target.value.split('/').map(Number);
     const newTimeSignature: TimeSignature = { numerator: num, denominator: denom };
     setTimeSignature(newTimeSignature);
-    metronomeAudioEngine.setTimeSignature(newTimeSignature);
+    await metronomeAudioEngine.setTimeSignature(newTimeSignature);
   };
 
   if (!visible) return null;
