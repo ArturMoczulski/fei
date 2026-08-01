@@ -1,5 +1,13 @@
 # Fei Instrument Design
 
+## Key Notation
+
+When listing keys, we use the format: **QWERTY / DVORAK**
+
+For example: `U / G` means press the U key on a QWERTY keyboard or the G key on a DVORAK keyboard to trigger the same action.
+
+---
+
 ## Overview
 
 Fei is an isomorphic split keyboard instrument that transforms a computer keyboard into a musical instrument. The instrument is designed to be played with two independent hands, each controlling a separate pitch range, with octave control per hand.
@@ -20,17 +28,17 @@ Each hand has access to **12 consecutive semitones** (one full chromatic octave)
 
 | Row | Position 1 | Position 2 | Position 3 | Position 4 |
 |-----|------------|------------|------------|------------|
-| Upper | G/U | C/I | R/E | L/P |
-| Home | H/J | T/K | N/L | S/; |
-| Lower | M/M | W/, | V/. | Z// |
+| Upper | `U / G` | `I / C` | `E / R` | `P / L` |
+| Home | `J / H` | `K / T` | `L / N` | `; / S` |
+| Lower | `M / M` | `, / W` | `. / V` | `/ / Z` |
 
 ### Left Hand (mirror of right, lowest to highest pitch)
 
 | Row | Position 1 | Position 2 | Position 3 | Position 4 |
 |-----|------------|------------|------------|------------|
-| Upper | ;/' | ,/[ | ./] | '/= |
-| Home | A/- | O/Tab | E/Esc | U/Bksp |
-| Lower | Q/Z | J/X | K/C | ;/V |
+| Upper | `/ / ;` | `. / ,` | `, / .` | `' / '` |
+| Home | `- / A` | `Tab / O` | `Esc / E` | `Bksp / U` |
+| Lower | `Z / Q` | `X / J` | `C / K` | `V / ;` |
 
 ## Pitch Organization
 
@@ -58,12 +66,15 @@ Each hand has **independent octave control**, allowing:
 - Full range coverage without hand repositioning
 
 The octave buttons are mapped to keyboard keys:
-- **Right hand**: O+/O- (QWERTY: 7/8)
-- **Left hand**: O+/O- (QWERTY: 4/3)
+
+| Hand | Increase | Decrease |
+|------|----------|----------|
+| Right | `7 / O+` | `8 / O-` |
+| Left | `4 / O+` | `3 / O-` |
 
 ## Key Transposition
 
-The **Key Selector** determines the root note of the scale. This transposes all notes while maintaining their interv relationships.
+The **Key Selector** determines the root note of the scale. This transposes all notes while maintaining their interval relationships.
 
 For example, if Key = C:
 - The upper-left button plays C
@@ -79,10 +90,10 @@ Each grid position corresponds to a specific **interval** (semitone offset) from
 
 | Position | Upper Row | Home Row | Lower Row |
 |----------|-----------|----------|-----------|
-| 1 (lowest) | +9 semitones | +5 semitones | +1 semitone |
-| 2 | +10 semitones | +6 semitones | +2 semitones |
-| 3 | +11 semitones | +7 semitones | +3 semitones |
-| 4 (highest) | +12 semitones | +8 semitones | +4 semitones |
+| 1 (lowest) | +9 | +5 | +1 |
+| 2 | +10 | +6 | +2 |
+| 3 | +11 | +7 | +3 |
+| 4 (highest) | +12 | +8 | +4 |
 
 The interval values (e.g., +7) represent the semitone distance from the lowest note in that hand's octave.
 
@@ -130,7 +141,7 @@ The built-in metronome provides:
 ## Display Information
 
 Each sound button displays:
-- **Key label**: The physical key to press (e.g., G for DVORAK, U for QWERTY)
+- **Key label**: The physical keys to press (`QWERTY / DVORAK`)
 - **Note name**: The musical note at current octave and key setting (e.g., C, D#, F#)
 - **Interval**: Semitone offset from the lowest note (+0 to +11)
 - **Frequency**: The actual Hz value of the note at current settings
