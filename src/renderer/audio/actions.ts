@@ -83,3 +83,13 @@ function semitoneToNote(keyNoteIndex: number, semitone: number): string {
 export function isSoundAction(action: string): boolean {
   return action.startsWith('left_hand_sound_') || action.startsWith('right_hand_sound_');
 }
+
+export function calculateFrequency(semitone: number, octave: number, keyNoteIndex: number): number {
+  const NOTES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+  const note = NOTES[(keyNoteIndex + semitone) % 12];
+  const noteIndex = NOTES.indexOf(note);
+  const totalSemitones = keyNoteIndex + semitone;
+  const octaveOffset = Math.floor(totalSemitones / 12);
+  const midiNumber = (octave + octaveOffset + 1) * 12 + noteIndex;
+  return 440 * Math.pow(2, (midiNumber - 69) / 12);
+}

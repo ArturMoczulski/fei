@@ -73,6 +73,17 @@ class AudioEngine {
     notes.delete(frequency);
   }
 
+  stopNoteForHand(hand: 'left' | 'right'): void {
+    if (!this.initialized) return;
+
+    const synth = this.synths.get(hand);
+    const notes = this.activeNotes.get(hand);
+    if (!synth || !notes) return;
+
+    synth.releaseAll();
+    notes.clear();
+  }
+
   stopAllNotes(): void {
     this.synths.forEach((synth, hand) => {
       synth.releaseAll();

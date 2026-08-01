@@ -1,31 +1,26 @@
 import React from 'react';
 import { KeyBindingTooltip } from './KeyBindingTooltip';
-import type { KeyboardLayout, KeyMapping } from '@shared/types';
+import { useAppStore } from '../store/appStore';
+import type { KeyboardLayout } from '@shared/types';
 import { getLayout, getKeyDisplayKey, semitoneToNote } from '../keyboard/layouts';
 
 interface KeyboardHandProps {
   hand: 'left' | 'right';
   baseOctave: number;
-  onOctaveChange: (octave: number) => void;
-  pressedKeys: Set<string>;
   keyboardLayout: KeyboardLayout;
+  activeNotes: { note: string; octave: number; key: string }[];
   selectedKey: number;
 }
 
 function KeyboardHand({
   hand,
   baseOctave,
-  onOctaveChange,
-  pressedKeys,
   keyboardLayout,
   selectedKey,
 }: KeyboardHandProps) {
   const layout = getLayout(keyboardLayout);
   const handMappings = layout.filter(m => m.hand === hand);
-
-  const isPressed = (key: string) => {
-    return pressedKeys.has(key);
-  };
+  const { setLeftOctave, setRightOctave, isPressed } = useAppStore();
 
   const getMappingAt = (row: number, col: number) => {
     return handMappings[row * 4 + col];
@@ -35,14 +30,18 @@ function KeyboardHand({
   const increaseAction = hand === 'left' ? 'left_hand_increase_octave' : 'right_hand_increase_octave';
 
   const handleDecrement = () => {
-    if (baseOctave > 1) {
-      onOctaveChange(baseOctave - 1);
+    if (hand === 'left') {
+      setLeftOctave(Math.max(1, baseOctave - 1));
+    } else {
+      setRightOctave(Math.max(1, baseOctave - 1));
     }
   };
 
   const handleIncrement = () => {
-    if (baseOctave < 8) {
-      onOctaveChange(baseOctave + 1);
+    if (hand === 'left') {
+      setLeftOctave(Math.min(8, baseOctave + 1));
+    } else {
+      setRightOctave(Math.min(8, baseOctave + 1));
     }
   };
 
@@ -111,7 +110,7 @@ function KeyboardHand({
             {[0, 1, 2, 3].map(col => {
               const mapping = getMappingAt(row, col);
               if (!mapping) return null;
-              const pressed = isPressed(mapping.key);
+              const pressed = isPressed(mapping.key.toLowerCase());
               const noteName = semitoneToNote(mapping.semitone, selectedKey);
               const frequency = calculateFrequency(mapping.semitone, baseOctave);
               return (
