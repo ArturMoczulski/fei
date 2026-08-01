@@ -59,7 +59,7 @@ impl Voice {
             attack: 0.0,
             decay: 0.0,
             sustain: 0.0,
-            release: 0.02,
+            release: 0.05,
         };
         self.state = VoiceState::Release;
         self.release_start_amplitude = 1.0;

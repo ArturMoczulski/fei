@@ -25,7 +25,7 @@ pub struct AudioEngine {
     command_tx: Option<Sender<AudioCommand>>,
     initialized: AtomicBool,
     volume: f32,
-    metronome_stop_flag: Arc<AtomicBool>,
+    metronome_running: Arc<AtomicBool>,
 }
 
 impl AudioEngine {
@@ -34,7 +34,7 @@ impl AudioEngine {
             command_tx: None,
             initialized: AtomicBool::new(false),
             volume: 0.5,
-            metronome_stop_flag: Arc::new(AtomicBool::new(false)),
+            metronome_running: Arc::new(AtomicBool::new(false)),
         }
     }
 
@@ -71,12 +71,14 @@ impl AudioEngine {
         let volume = Arc::new(std::sync::Mutex::new(0.5f32));
         let stop_all_flag = Arc::new(AtomicBool::new(false));
         let panic_flag = Arc::new(AtomicBool::new(false));
+        let metronome_voice = Arc::new(std::sync::Mutex::new(Voice::new()));
 
         let voices_cmd = voices.clone();
         let freqs_cmd = freqs.clone();
         let stop_all_cmd = stop_all_flag.clone();
         let panic_cmd = panic_flag.clone();
         let volume_cmd = volume.clone();
+        let metronome_voice_cmd = metronome_voice.clone();
 
         thread::spawn(move || {
             while let Ok(cmd) = command_rx.recv() {
@@ -113,15 +115,8 @@ impl AudioEngine {
                         panic_cmd.store(true, Ordering::SeqCst);
                     }
                     AudioCommand::MetronomeTick { frequency } => {
-                        let mut voices = voices_cmd.lock().unwrap();
-                        let mut freqs = freqs_cmd.lock().unwrap();
-                        for i in 0..MAX_POLYPHONY {
-                            if voices[i].state == VoiceState::Off {
-                                voices[i].trigger_click(frequency);
-                                freqs[i] = frequency;
-                                break;
-                            }
-                        }
+                        let mut metro = metronome_voice_cmd.lock().unwrap();
+                        metro.trigger_click(frequency);
                     }
                 }
             }
@@ -134,6 +129,7 @@ impl AudioEngine {
                 let vol_audio = volume.clone();
                 let stop_all_audio = stop_all_flag.clone();
                 let panic_audio = panic_flag.clone();
+                let metronome_audio = metronome_voice.clone();
 
                 let _stream = device.build_output_stream(
                     &stream_config,
@@ -149,6 +145,7 @@ impl AudioEngine {
                             for i in 0..MAX_POLYPHONY {
                                 freqs_audio.lock().unwrap()[i] = 0.0;
                             }
+                            *metronome_audio.lock().unwrap() = Voice::new();
                         }
 
                         if panic_audio.load(Ordering::SeqCst) {
@@ -159,6 +156,7 @@ impl AudioEngine {
                             for i in 0..MAX_POLYPHONY {
                                 freqs_audio.lock().unwrap()[i] = 0.0;
                             }
+                            *metronome_audio.lock().unwrap() = Voice::new();
                         }
 
                         for i in 0..num_samples {
@@ -170,6 +168,13 @@ impl AudioEngine {
                                     if voices[j].state != VoiceState::Off {
                                         mixed_sample += voices[j].process();
                                     }
+                                }
+                            }
+
+                            {
+                                let mut metro = metronome_audio.lock().unwrap();
+                                if metro.state != VoiceState::Off {
+                                    mixed_sample += metro.process();
                                 }
                             }
 
@@ -262,21 +267,25 @@ impl AudioEngine {
             return;
         }
 
-        self.metronome_stop_flag.store(false, Ordering::SeqCst);
+        if self.metronome_running.load(Ordering::SeqCst) {
+            return;
+        }
 
         let tx = match self.command_tx {
             Some(ref tx) => tx.clone(),
             None => return,
         };
 
-        let stop_flag = self.metronome_stop_flag.clone();
         let metronome_freq = METRONOME_FREQUENCY;
         let interval_ms = (60000.0 / bpm as f64) as u64;
+
+        let running_flag = self.metronome_running.clone();
+        self.metronome_running.store(true, Ordering::SeqCst);
 
         std::thread::spawn(move || {
             loop {
                 std::thread::sleep(Duration::from_millis(interval_ms));
-                if stop_flag.load(Ordering::SeqCst) {
+                if !running_flag.load(Ordering::SeqCst) {
                     break;
                 }
                 if tx.send(AudioCommand::MetronomeTick { frequency: metronome_freq }).is_err() {
@@ -287,7 +296,7 @@ impl AudioEngine {
     }
 
     pub fn metronome_stop(&self) {
-        self.metronome_stop_flag.store(true, Ordering::SeqCst);
+        self.metronome_running.store(false, Ordering::SeqCst);
     }
 }
 
