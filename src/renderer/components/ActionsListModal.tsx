@@ -1,14 +1,15 @@
 import React from 'react';
+import { useAppStore } from '../store/appStore';
 import { getKeyBindingForAction } from '../keyboard/keyBindings';
 import actions from '../../../mappings/actions.json';
-import type { KeyboardLayout } from '@shared/types';
 
-interface ActionsListModalProps {
-  keyboardLayout: KeyboardLayout;
-  onClose: () => void;
-}
+function ActionsListModal() {
+  const keyboardLayout = useAppStore(state => state.keyboardLayout);
+  const showActions = useAppStore(state => state.showActions);
+  const toggleActions = useAppStore(state => state.toggleActions);
 
-export function ActionsListModal({ keyboardLayout, onClose }: ActionsListModalProps) {
+  if (!showActions) return null;
+
   const formatActionName = (action: string): string => {
     return action
       .replace(/_/g, ' ')
@@ -36,14 +37,16 @@ export function ActionsListModal({ keyboardLayout, onClose }: ActionsListModalPr
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div className="modal-overlay" onClick={toggleActions}>
       <div className="modal actions-modal" onClick={e => e.stopPropagation()}>
         <div className="modal-title">Keyboard Actions</div>
         <div className="actions-list">
           {Object.entries(actions.categories).map(([name, data]) => renderCategory(name, data as { description: string; actions: string[] }))}
         </div>
-        <button className="modal-close" onClick={onClose}>Close</button>
+        <button className="modal-close" onClick={toggleActions}>Close</button>
       </div>
     </div>
   );
 }
+
+export default ActionsListModal;

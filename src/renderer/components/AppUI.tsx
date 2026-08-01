@@ -2,10 +2,9 @@ import React from 'react';
 import TitleBar from './TitleBar';
 import KeyboardHand from './KeyboardHand';
 import SettingsModal from './SettingsModal';
-import { ActionsListModal } from './ActionsListModal';
+import ActionsListModal from './ActionsListModal';
 import KeySelector from './KeySelector';
 import Metronome from './Metronome';
-import { audioEngine } from '../audio/AudioEngine';
 import { useAppStore } from '../store/appStore';
 import { getLayout, semitoneToNote } from '../keyboard/layouts';
 import type { KeyMapping } from '@shared/types';
@@ -96,23 +95,9 @@ export function AppUI() {
         <span>{audioReady ? 'Audio Ready' : 'Click any key to enable audio'}</span>
       </div>
 
-      {showSettings && (
-        <SettingsModal
-          keyboardLayout={keyboardLayout}
-          volume={volume}
-          onLayoutChange={setKeyboardLayout}
-          onVolumeChange={setVolume}
-          onPanic={() => audioEngine.panic()}
-          onClose={toggleSettings}
-        />
-      )}
+      {showSettings && <SettingsModal />}
 
-      {showActions && (
-        <ActionsListModal
-          keyboardLayout={keyboardLayout}
-          onClose={toggleActions}
-        />
-      )}
+      {showActions && <ActionsListModal />}
     </>
   );
 }

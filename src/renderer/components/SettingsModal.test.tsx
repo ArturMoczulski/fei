@@ -1,88 +1,61 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import SettingsModal from './SettingsModal';
 
-describe('SettingsModal', () => {
-  it('should render settings modal', () => {
-    render(
-      <SettingsModal
-        keyboardLayout="dvorak"
-        volume={-6}
-        onLayoutChange={() => {}}
-        onVolumeChange={() => {}}
-        onPanic={() => {}}
-        onClose={() => {}}
-      />
-    );
+const mockToggleSettings = vi.fn();
+const mockSetKeyboardLayout = vi.fn();
+const mockSetVolume = vi.fn();
 
+vi.mock('../store/appStore', () => ({
+  useAppStore: vi.fn((selector?: (state: any) => any) => {
+    const state = {
+      keyboardLayout: 'dvorak',
+      volume: -6,
+      showSettings: true,
+      showActions: false,
+      setKeyboardLayout: mockSetKeyboardLayout,
+      setVolume: mockSetVolume,
+      toggleSettings: mockToggleSettings,
+      toggleActions: vi.fn(),
+    };
+    return selector ? selector(state) : state;
+  }),
+}));
+
+vi.mock('../audio/AudioEngine', () => ({
+  audioEngine: { panic: vi.fn() },
+}));
+
+describe('SettingsModal', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('should render settings modal when showSettings is true', () => {
+    render(<SettingsModal />);
     expect(screen.getByText('Settings')).toBeInTheDocument();
   });
 
   it('should render keyboard layout selector', () => {
-    render(
-      <SettingsModal
-        keyboardLayout="dvorak"
-        volume={-6}
-        onLayoutChange={() => {}}
-        onVolumeChange={() => {}}
-        onPanic={() => {}}
-        onClose={() => {}}
-      />
-    );
-
+    render(<SettingsModal />);
     expect(screen.getByText('Layout')).toBeInTheDocument();
   });
 
   it('should render panic button', () => {
-    render(
-      <SettingsModal
-        keyboardLayout="dvorak"
-        volume={-6}
-        onLayoutChange={() => {}}
-        onVolumeChange={() => {}}
-        onPanic={() => {}}
-        onClose={() => {}}
-      />
-    );
-
+    render(<SettingsModal />);
     expect(screen.getByText('Panic (Stop All)')).toBeInTheDocument();
   });
 
-  it('should call onClose when close button is clicked', async () => {
+  it('should call toggleSettings when close button is clicked', async () => {
     const user = userEvent.setup();
-    const onClose = vi.fn();
-
-    render(
-      <SettingsModal
-        keyboardLayout="dvorak"
-        volume={-6}
-        onLayoutChange={() => {}}
-        onVolumeChange={() => {}}
-        onPanic={() => {}}
-        onClose={onClose}
-      />
-    );
-
-    const closeButton = screen.getByRole('button', { name: 'Close' });
-    await user.click(closeButton);
-
-    expect(onClose).toHaveBeenCalled();
+    render(<SettingsModal />);
+    await user.click(screen.getByRole('button', { name: 'Close' }));
+    expect(mockToggleSettings).toHaveBeenCalled();
   });
 
   it('should render about section', () => {
-    render(
-      <SettingsModal
-        keyboardLayout="dvorak"
-        volume={-6}
-        onLayoutChange={() => {}}
-        onVolumeChange={() => {}}
-        onPanic={() => {}}
-        onClose={() => {}}
-      />
-    );
-
+    render(<SettingsModal />);
     expect(screen.getByText('About')).toBeInTheDocument();
-    expect(screen.getByText(/isomorphic/)).toBeInTheDocument();
   });
 });

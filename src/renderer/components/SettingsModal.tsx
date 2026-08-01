@@ -1,25 +1,19 @@
 import React from 'react';
-import type { KeyboardLayout } from '@shared/types';
+import { useAppStore } from '../store/appStore';
+import { audioEngine } from '../audio/AudioEngine';
 
-interface SettingsModalProps {
-  keyboardLayout: KeyboardLayout;
-  volume: number;
-  onLayoutChange: (layout: KeyboardLayout) => void;
-  onVolumeChange: (volume: number) => void;
-  onPanic: () => void;
-  onClose: () => void;
-}
+function SettingsModal() {
+  const keyboardLayout = useAppStore(state => state.keyboardLayout);
+  const volume = useAppStore(state => state.volume);
+  const showSettings = useAppStore(state => state.showSettings);
+  const setKeyboardLayout = useAppStore(state => state.setKeyboardLayout);
+  const setVolume = useAppStore(state => state.setVolume);
+  const toggleSettings = useAppStore(state => state.toggleSettings);
 
-function SettingsModal({
-  keyboardLayout,
-  volume,
-  onLayoutChange,
-  onVolumeChange,
-  onPanic,
-  onClose,
-}: SettingsModalProps) {
+  if (!showSettings) return null;
+
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div className="modal-overlay" onClick={toggleSettings}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
         <h2 className="modal-title">Settings</h2>
 
@@ -30,7 +24,7 @@ function SettingsModal({
             <select
               className="settings-select"
               value={keyboardLayout}
-              onChange={(e) => onLayoutChange(e.target.value as KeyboardLayout)}
+              onChange={(e) => setKeyboardLayout(e.target.value as 'qwerty' | 'dvorak')}
             >
               <option value="qwerty">QWERTY</option>
               <option value="dvorak">Dvorak</option>
@@ -49,14 +43,14 @@ function SettingsModal({
                 min="-40"
                 max="0"
                 value={volume}
-                onChange={(e) => onVolumeChange(Number(e.target.value))}
+                onChange={(e) => setVolume(Number(e.target.value))}
               />
               <span style={{ fontSize: '12px', minWidth: '40px' }}>{volume}dB</span>
             </div>
           </div>
           <div className="modal-row">
             <span>Panic (Stop All)</span>
-            <button className="panic-settings-btn" onClick={onPanic}>
+            <button className="panic-settings-btn" onClick={() => audioEngine.panic()}>
               ■
             </button>
           </div>
@@ -71,7 +65,7 @@ function SettingsModal({
           </div>
         </div>
 
-        <button className="modal-close" onClick={onClose}>
+        <button className="modal-close" onClick={toggleSettings}>
           Close
         </button>
       </div>
