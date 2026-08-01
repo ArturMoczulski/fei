@@ -111,13 +111,13 @@ function App() {
         activeFrequencies.set(key, frequency);
         audioEngine.playNote(frequency, mapping.hand);
       } else if (mapping.action === 'left_hand_increase_octave') {
-        handleLeftOctaveChange(leftOctave + 1);
+        if (leftOctave < 8) handleLeftOctaveChange(leftOctave + 1);
       } else if (mapping.action === 'left_hand_decrease_octave') {
-        handleLeftOctaveChange(leftOctave - 1);
+        if (leftOctave > 1) handleLeftOctaveChange(leftOctave - 1);
       } else if (mapping.action === 'right_hand_increase_octave') {
-        handleRightOctaveChange(rightOctave + 1);
+        if (rightOctave < 8) handleRightOctaveChange(rightOctave + 1);
       } else if (mapping.action === 'right_hand_decrease_octave') {
-        handleRightOctaveChange(rightOctave - 1);
+        if (rightOctave > 1) handleRightOctaveChange(rightOctave - 1);
       }
     }
   }, [keyboardLayout, leftOctave, rightOctave, selectedKey, audioReady, showSettings, initAudio, activeFrequencies, handleLeftOctaveChange, handleRightOctaveChange]);
