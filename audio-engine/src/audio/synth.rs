@@ -51,6 +51,20 @@ impl Voice {
         self.state = VoiceState::Attack;
     }
 
+    pub fn trigger_click(&mut self, frequency: f32) {
+        self.frequency = frequency;
+        self.phase = 0.0;
+        self.age = 0.0;
+        self.envelope = Envelope {
+            attack: 0.0,
+            decay: 0.0,
+            sustain: 0.0,
+            release: 0.02,
+        };
+        self.state = VoiceState::Release;
+        self.release_start_amplitude = 1.0;
+    }
+
     pub fn release(&mut self) {
         if self.state != VoiceState::Off {
             self.state = VoiceState::Release;
@@ -325,5 +339,36 @@ mod tests {
         }
 
         assert!((voice.current_amplitude() - 0.7).abs() < 0.01);
+    }
+
+    #[test]
+    fn test_trigger_click() {
+        let mut voice = Voice::new();
+        voice.trigger_click(1000.0);
+        assert_eq!(voice.state, VoiceState::Release);
+        assert_eq!(voice.frequency, 1000.0);
+        assert_eq!(voice.phase, 0.0);
+        assert_eq!(voice.envelope.release, 0.02);
+        assert_eq!(voice.envelope.attack, 0.0);
+        assert_eq!(voice.envelope.decay, 0.0);
+        assert_eq!(voice.envelope.sustain, 0.0);
+        assert_eq!(voice.release_start_amplitude, 1.0);
+    }
+
+    #[test]
+    fn test_trigger_click_creates_short_sound() {
+        let mut voice = Voice::new();
+        voice.trigger_click(1000.0);
+
+        assert_eq!(voice.state, VoiceState::Release);
+
+        let mut iterations = 0;
+        let max_iterations = 10000;
+        while voice.state != VoiceState::Off && iterations < max_iterations {
+            voice.process();
+            iterations += 1;
+        }
+        assert!(iterations < max_iterations, "Voice did not go Off after {} iterations, state: {:?}", iterations, voice.state);
+        assert_eq!(voice.state, VoiceState::Off);
     }
 }

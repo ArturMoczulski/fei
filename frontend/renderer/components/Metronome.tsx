@@ -36,12 +36,11 @@ function Metronome({ visible }: MetronomeProps) {
   }, []);
 
   const toggleMetronome = async () => {
-    await metronomeAudioEngine.init();
     if (isRunning) {
       metronomeAudioEngine.stop();
       setIsRunning(false);
     } else {
-      metronomeAudioEngine.start(bpm, timeSignature);
+      await metronomeAudioEngine.start(bpm, timeSignature);
       setIsRunning(true);
     }
   };

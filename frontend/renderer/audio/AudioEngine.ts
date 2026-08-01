@@ -12,12 +12,12 @@ class AudioEngine {
 
   playNote(frequency: number, hand: 'left' | 'right'): void {
     if (!this.initialized) return;
-    invoke('cmd_play_note_raw', { frequency, hand });
+    invoke('cmd_play_note_raw', { frequency });
   }
 
   stopNote(frequency: number, hand: 'left' | 'right'): void {
     if (!this.initialized) return;
-    invoke('cmd_stop_note_raw', { frequency, hand });
+    invoke('cmd_stop_note_raw', { frequency });
   }
 
   stopAllNotes(): void {

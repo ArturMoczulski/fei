@@ -7,8 +7,10 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::mpsc::{channel, Receiver, Sender};
 use std::thread;
 use std::sync::Arc;
+use std::time::Duration;
 
 const MAX_POLYPHONY: usize = 128;
+const METRONOME_FREQUENCY: f32 = 1000.0;
 
 pub enum AudioCommand {
     NoteOn { frequency: f32 },
@@ -16,12 +18,14 @@ pub enum AudioCommand {
     SetVolume(f32),
     StopAll,
     Panic,
+    MetronomeTick { frequency: f32 },
 }
 
 pub struct AudioEngine {
     command_tx: Option<Sender<AudioCommand>>,
     initialized: AtomicBool,
     volume: f32,
+    metronome_stop_flag: Arc<AtomicBool>,
 }
 
 impl AudioEngine {
@@ -30,6 +34,7 @@ impl AudioEngine {
             command_tx: None,
             initialized: AtomicBool::new(false),
             volume: 0.5,
+            metronome_stop_flag: Arc::new(AtomicBool::new(false)),
         }
     }
 
@@ -106,6 +111,17 @@ impl AudioEngine {
                     }
                     AudioCommand::Panic => {
                         panic_cmd.store(true, Ordering::SeqCst);
+                    }
+                    AudioCommand::MetronomeTick { frequency } => {
+                        let mut voices = voices_cmd.lock().unwrap();
+                        let mut freqs = freqs_cmd.lock().unwrap();
+                        for i in 0..MAX_POLYPHONY {
+                            if voices[i].state == VoiceState::Off {
+                                voices[i].trigger_click(frequency);
+                                freqs[i] = frequency;
+                                break;
+                            }
+                        }
                     }
                 }
             }
@@ -240,10 +256,104 @@ impl AudioEngine {
     pub fn is_initialized(&self) -> bool {
         self.initialized.load(Ordering::SeqCst)
     }
+
+    pub fn metronome_start(&self, bpm: u32) {
+        if !self.initialized.load(Ordering::SeqCst) {
+            return;
+        }
+
+        self.metronome_stop_flag.store(false, Ordering::SeqCst);
+
+        let tx = match self.command_tx {
+            Some(ref tx) => tx.clone(),
+            None => return,
+        };
+
+        let stop_flag = self.metronome_stop_flag.clone();
+        let metronome_freq = METRONOME_FREQUENCY;
+        let interval_ms = (60000.0 / bpm as f64) as u64;
+
+        std::thread::spawn(move || {
+            loop {
+                std::thread::sleep(Duration::from_millis(interval_ms));
+                if stop_flag.load(Ordering::SeqCst) {
+                    break;
+                }
+                if tx.send(AudioCommand::MetronomeTick { frequency: metronome_freq }).is_err() {
+                    break;
+                }
+            }
+        });
+    }
+
+    pub fn metronome_stop(&self) {
+        self.metronome_stop_flag.store(true, Ordering::SeqCst);
+    }
 }
 
 impl Default for AudioEngine {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_audio_command_note_on() {
+        let cmd = AudioCommand::NoteOn { frequency: 440.0 };
+        match cmd {
+            AudioCommand::NoteOn { frequency } => assert_eq!(frequency, 440.0),
+            _ => panic!("Expected NoteOn"),
+        }
+    }
+
+    #[test]
+    fn test_audio_command_note_off() {
+        let cmd = AudioCommand::NoteOff { frequency: 440.0 };
+        match cmd {
+            AudioCommand::NoteOff { frequency } => assert_eq!(frequency, 440.0),
+            _ => panic!("Expected NoteOff"),
+        }
+    }
+
+    #[test]
+    fn test_audio_command_set_volume() {
+        let cmd = AudioCommand::SetVolume(0.8);
+        match cmd {
+            AudioCommand::SetVolume(vol) => assert_eq!(vol, 0.8),
+            _ => panic!("Expected SetVolume"),
+        }
+    }
+
+    #[test]
+    fn test_audio_command_metronome_tick() {
+        let cmd = AudioCommand::MetronomeTick { frequency: 1000.0 };
+        match cmd {
+            AudioCommand::MetronomeTick { frequency } => assert_eq!(frequency, 1000.0),
+            _ => panic!("Expected MetronomeTick"),
+        }
+    }
+
+    #[test]
+    fn test_audio_engine_new() {
+        let engine = AudioEngine::new();
+        assert!(!engine.is_initialized());
+        assert_eq!(engine.get_volume(), 0.5);
+    }
+
+    #[test]
+    fn test_audio_engine_set_volume() {
+        let mut engine = AudioEngine::new();
+        engine.set_volume(0.8);
+        assert_eq!(engine.get_volume(), 0.8);
+    }
+
+    #[test]
+    fn test_metronome_stop_flag_initial_state() {
+        let engine = AudioEngine::new();
+        assert!(!engine.is_initialized());
     }
 }

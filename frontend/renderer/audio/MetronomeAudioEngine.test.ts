@@ -1,9 +1,17 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { metronomeAudioEngine, TimeSignature } from '../../renderer/audio/MetronomeAudioEngine';
 
-import { metronomeAudioEngine } from '../../renderer/audio/MetronomeAudioEngine';
-import type { TimeSignature } from '../../renderer/audio/MetronomeAudioEngine';
+vi.mock('@tauri-apps/api/core', () => ({
+  invoke: vi.fn(),
+}));
 
 describe('MetronomeAudioEngine', () => {
+  beforeEach(() => {
+    metronomeAudioEngine.stop();
+    metronomeAudioEngine.setBpm(120);
+    metronomeAudioEngine.setTimeSignature({ numerator: 4, denominator: 4 });
+  });
+
   describe('getBpm', () => {
     it('should return default BPM of 120', () => {
       expect(metronomeAudioEngine.getBpm()).toBe(120);
@@ -34,6 +42,11 @@ describe('MetronomeAudioEngine', () => {
       metronomeAudioEngine.setBpm(-50);
       expect(metronomeAudioEngine.getBpm()).toBeGreaterThan(0);
     });
+
+    it('should not restart metronome when not running', () => {
+      metronomeAudioEngine.setBpm(100);
+      expect(metronomeAudioEngine.getIsRunning()).toBe(false);
+    });
   });
 
   describe('setTimeSignature', () => {
@@ -49,6 +62,44 @@ describe('MetronomeAudioEngine', () => {
       metronomeAudioEngine.setTimeSignature(signature);
       expect(metronomeAudioEngine.getTimeSignature().numerator).toBe(6);
       expect(metronomeAudioEngine.getTimeSignature().denominator).toBe(8);
+    });
+  });
+
+  describe('start', () => {
+    it('should set isRunning to true', () => {
+      metronomeAudioEngine.start(120);
+      expect(metronomeAudioEngine.getIsRunning()).toBe(true);
+    });
+
+    it('should not start if already running', () => {
+      metronomeAudioEngine.start(120);
+      metronomeAudioEngine.start(100);
+      expect(metronomeAudioEngine.getBpm()).toBe(120);
+    });
+
+    it('should clamp BPM to minimum of 20', () => {
+      metronomeAudioEngine.start(10);
+      expect(metronomeAudioEngine.getBpm()).toBe(20);
+    });
+  });
+
+  describe('stop', () => {
+    it('should set isRunning to false', () => {
+      metronomeAudioEngine.start(120);
+      metronomeAudioEngine.stop();
+      expect(metronomeAudioEngine.getIsRunning()).toBe(false);
+    });
+
+    it('should do nothing if not running', () => {
+      expect(() => metronomeAudioEngine.stop()).not.toThrow();
+    });
+  });
+
+  describe('dispose', () => {
+    it('should stop the metronome', () => {
+      metronomeAudioEngine.start(120);
+      metronomeAudioEngine.dispose();
+      expect(metronomeAudioEngine.getIsRunning()).toBe(false);
     });
   });
 });

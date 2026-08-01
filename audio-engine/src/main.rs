@@ -97,6 +97,18 @@ fn cmd_is_audio_ready() -> bool {
     engine.is_initialized()
 }
 
+#[tauri::command]
+fn cmd_metronome_start(bpm: u32) {
+    let engine = AUDIO_ENGINE.lock();
+    engine.metronome_start(bpm);
+}
+
+#[tauri::command]
+fn cmd_metronome_stop() {
+    let engine = AUDIO_ENGINE.lock();
+    engine.metronome_stop();
+}
+
 fn main() {
     env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("info")).init();
 
@@ -115,6 +127,8 @@ fn main() {
             cmd_set_volume,
             cmd_get_volume,
             cmd_is_audio_ready,
+            cmd_metronome_start,
+            cmd_metronome_stop,
         ])
         .setup(|_app| {
             info!("Fei setup complete");

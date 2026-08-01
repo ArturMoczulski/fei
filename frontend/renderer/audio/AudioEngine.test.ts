@@ -1,10 +1,14 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { invoke } from '@tauri-apps/api/core';
 import { audioEngine } from '../../renderer/audio/AudioEngine';
+
+vi.mock('@tauri-apps/api/core', () => ({
+  invoke: vi.fn(),
+}));
 
 describe('AudioEngine', () => {
   beforeEach(() => {
-    audioEngine.dispose();
+    vi.clearAllMocks();
   });
 
   describe('initial state', () => {
@@ -12,38 +16,43 @@ describe('AudioEngine', () => {
       expect(audioEngine.isInitialized()).toBe(false);
     });
 
-    it('should have default volume of -6', () => {
-      expect(audioEngine.getVolume()).toBe(-6);
+    it('should have default volume of 0.5', () => {
+      expect(audioEngine.getVolume()).toBe(0.5);
     });
   });
 
-  describe('volume', () => {
-    it('should set volume', () => {
+  describe('setVolume', () => {
+    it('should call invoke with cmd_set_volume regardless of init state', () => {
       audioEngine.setVolume(-12);
-      expect(audioEngine.getVolume()).toBe(-12);
-    });
-
-    it('should set volume to 0', () => {
-      audioEngine.setVolume(0);
-      expect(audioEngine.getVolume()).toBe(0);
-    });
-
-    it('should set volume to -40', () => {
-      audioEngine.setVolume(-40);
-      expect(audioEngine.getVolume()).toBe(-40);
-    });
-
-    it('should set positive volume', () => {
-      audioEngine.setVolume(-3);
-      expect(audioEngine.getVolume()).toBe(-3);
+      expect(invoke).toHaveBeenCalledWith('cmd_set_volume', { volume: -12 });
     });
   });
 
-  describe('dispose', () => {
-    it('should reset initialized state', () => {
-      expect(audioEngine.isInitialized()).toBe(false);
-      audioEngine.dispose();
-      expect(audioEngine.isInitialized()).toBe(false);
+  describe('playNote', () => {
+    it('should not call invoke when not initialized', () => {
+      audioEngine.playNote(440, 'left');
+      expect(invoke).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('stopNote', () => {
+    it('should not call invoke when not initialized', () => {
+      audioEngine.stopNote(440, 'left');
+      expect(invoke).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('stopAllNotes', () => {
+    it('should not call invoke when not initialized', () => {
+      audioEngine.stopAllNotes();
+      expect(invoke).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('panic', () => {
+    it('should call invoke with cmd_panic regardless of init state', () => {
+      audioEngine.panic();
+      expect(invoke).toHaveBeenCalledWith('cmd_panic');
     });
   });
 });

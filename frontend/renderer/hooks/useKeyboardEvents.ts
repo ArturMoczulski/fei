@@ -1,6 +1,7 @@
 import { useEffect, useCallback, useRef } from 'react';
 import { useAppStore } from '../store/appStore';
 import { audioEngine } from '../audio/AudioEngine';
+import { metronomeAudioEngine } from '../audio/MetronomeAudioEngine';
 import { calculateFrequency } from '../audio/actions';
 import { getLayout } from '../keyboard/layouts';
 import type { KeyMapping } from '@shared/types';
@@ -46,6 +47,20 @@ export function useKeyboardEvents() {
 
     if (mapping.action === 'open_settings') {
       toggleSettings();
+      return;
+    }
+
+    if (mapping.action === 'panic_stop') {
+      audioEngine.panic();
+      return;
+    }
+
+    if (mapping.action === 'toggle_metronome') {
+      if (metronomeAudioEngine.getIsRunning()) {
+        metronomeAudioEngine.stop();
+      } else {
+        await metronomeAudioEngine.start(metronomeAudioEngine.getBpm(), metronomeAudioEngine.getTimeSignature());
+      }
       return;
     }
 
