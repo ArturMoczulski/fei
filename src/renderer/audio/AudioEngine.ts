@@ -127,6 +127,10 @@ class AudioEngine {
     this.activeNotes.clear();
     this.initialized = false;
   }
+
+  isInitialized(): boolean {
+    return this.initialized;
+  }
 }
 
 export const audioEngine = new AudioEngine();
