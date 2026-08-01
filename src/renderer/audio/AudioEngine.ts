@@ -10,7 +10,6 @@ class AudioEngine {
     if (this.initialized) return;
 
     Tone.context.lookAhead = 0;
-    Tone.context.latencyHint = 'interactive';
     await Tone.start();
 
     const leftSynth = new Tone.PolySynth(Tone.Synth, {
