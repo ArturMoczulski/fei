@@ -11,8 +11,9 @@ const TEMPO_PRESETS = [
   { label: 'Andante', value: 90 },
   { label: 'Moderato', value: 110 },
   { label: 'Allegro', value: 130 },
-  { label: 'Presto', value: 160 },
-  { label: 'Prestissimo', value: 180 },
+  { label: 'Vivace', value: 145 },
+  { label: 'Presto', value: 170 },
+  { label: 'Prestissimo', value: 200 },
 ];
 
 const TIME_SIGNATURES: TimeSignature[] = [
@@ -28,7 +29,7 @@ const TIME_SIGNATURES: TimeSignature[] = [
 
 function Metronome({ visible }: MetronomeProps) {
   const [isRunning, setIsRunning] = useState(false);
-  const [bpm, setBpm] = useState(120);
+  const [bpm, setBpm] = useState(110);
   const [timeSignature, setTimeSignature] = useState<TimeSignature>({ numerator: 4, denominator: 4 });
 
   useEffect(() => {
@@ -63,6 +64,11 @@ function Metronome({ visible }: MetronomeProps) {
       metronomeAudioEngine.stop();
       metronomeAudioEngine.start(newBpm, timeSignature);
     }
+  };
+
+  const syncBpm = (newBpm: number) => {
+    setBpm(newBpm);
+    metronomeAudioEngine.setBpm(newBpm);
   };
 
   const handleTimeSignatureChange = (e: React.ChangeEvent<HTMLSelectElement>) => {

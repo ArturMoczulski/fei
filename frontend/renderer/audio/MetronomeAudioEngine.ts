@@ -12,7 +12,6 @@ class MetronomeAudioEngine {
   private timeSignature: TimeSignature = { numerator: 4, denominator: 4 };
 
   async init(): Promise<void> {
-    console.log('MetronomeAudioEngine.init called');
   }
 
   async start(bpm: number, timeSignature?: TimeSignature): Promise<void> {
