@@ -39,8 +39,6 @@ export function useKeyboardEvents() {
 
     if (!mapping) return;
 
-    console.log(`[KeyDown] key=${key}, action=${mapping.action}`);
-
     if (mapping.action === 'toggle_actions_list') {
       toggleActions();
       return;
@@ -54,20 +52,15 @@ export function useKeyboardEvents() {
     if (showSettings) return;
 
     if (!audioReady) {
-      console.log('[KeyDown] Audio not ready, initializing...');
       await initAudio();
     }
 
     if (isSoundAction(mapping.action)) {
-      const t0 = performance.now();
       addPressedKey(key);
       const octave = mapping.hand === 'left' ? leftOctave : rightOctave;
       const frequency = calculateFrequency(mapping.semitone, octave, selectedKey);
-      const t1 = performance.now();
       activeFrequenciesRef.current.set(key, frequency);
       audioEngine.playNote(frequency, mapping.hand);
-      const t2 = performance.now();
-      console.log(`[KeyDown] calculateFrequency: ${t1-t0}ms, playNote: ${t2-t1}ms`);
     } else if (mapping.action === 'left_hand_increase_octave') {
       setLeftOctave(Math.min(8, leftOctave + 1));
     } else if (mapping.action === 'left_hand_decrease_octave') {
