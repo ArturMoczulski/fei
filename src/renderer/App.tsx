@@ -4,6 +4,7 @@ import KeyboardHand from './components/KeyboardHand';
 import SettingsModal from './components/SettingsModal';
 import KeySelector from './components/KeySelector';
 import Metronome from './components/Metronome';
+import { KeyBindingTooltip } from './components/KeyBindingTooltip';
 import { audioEngine } from './audio/AudioEngine';
 import { getLayout, getKeyDisplayKey, semitoneToNote } from './keyboard/layouts';
 import type { KeyboardLayout, KeyMapping } from '@shared/types';
@@ -193,7 +194,7 @@ function App() {
 
   return (
     <div className="app">
-      <TitleBar onSettingsClick={() => setShowSettings(true)} />
+      <TitleBar onSettingsClick={() => setShowSettings(true)} keyboardLayout={keyboardLayout} />
 
       <div className="main-content">
         <div className="hands-container">
@@ -239,13 +240,15 @@ function App() {
           </div>
         </div>
 
-        <button
-          className="panic-btn"
-          onClick={() => audioEngine.panic()}
-          title="Stop all sounds"
-        >
-          ■
-        </button>
+        <KeyBindingTooltip actions={['panic_stop']} keyboardLayout={keyboardLayout}>
+          <button
+            className="panic-btn"
+            onClick={() => audioEngine.panic()}
+            title="Stop all sounds"
+          >
+            ■
+          </button>
+        </KeyBindingTooltip>
       </div>
 
       <div className="status-bar">

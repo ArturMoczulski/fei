@@ -1,44 +1,65 @@
 {
-  "name": "DVORAK",
-  "description": "KeyMouse Dvorak layout physical key positions",
+  "name": "DVORAK Device Mapping",
+  "description": "KeyMouse Dvorak layout - physical keys mapped to action names",
   "leftHand": {
-    "upper": [
-      { "id": "upper_pinky", "key": "'" },
-      { "id": "upper_ring", "key": "," },
-      { "id": "upper_middle", "key": "." },
-      { "id": "upper_index", "key": "p" }
-    ],
-    "home": [
-      { "id": "home_pinky", "key": "a" },
-      { "id": "home_ring", "key": "o" },
-      { "id": "home_middle", "key": "e" },
-      { "id": "home_index", "key": "u" }
-    ],
-    "lower": [
-      { "id": "lower_pinky", "key": ";" },
-      { "id": "lower_ring", "key": "q" },
-      { "id": "lower_middle", "key": "j" },
-      { "id": "lower_index", "key": "k" }
-    ]
+    "soundButtons": {
+      "upper": [
+        { "key": "'", "action": "left_hand_sound_upper_pinky" },
+        { "key": ",", "action": "left_hand_sound_upper_ring" },
+        { "key": ".", "action": "left_hand_sound_upper_middle" },
+        { "key": "p", "action": "left_hand_sound_upper_index" }
+      ],
+      "home": [
+        { "key": "a", "action": "left_hand_sound_home_pinky" },
+        { "key": "o", "action": "left_hand_sound_home_ring" },
+        { "key": "e", "action": "left_hand_sound_home_middle" },
+        { "key": "u", "action": "left_hand_sound_home_index" }
+      ],
+      "lower": [
+        { "key": ";", "action": "left_hand_sound_lower_pinky" },
+        { "key": "q", "action": "left_hand_sound_lower_ring" },
+        { "key": "j", "action": "left_hand_sound_lower_middle" },
+        { "key": "k", "action": "left_hand_sound_lower_index" }
+      ]
+    },
+    "octaveButtons": {
+      "increase": { "key": "]", "action": "increase_left_octave" },
+      "decrease": { "key": "[", "action": "decrease_left_octave" }
+    }
   },
   "rightHand": {
-    "upper": [
-      { "id": "upper_index", "key": "g" },
-      { "id": "upper_middle", "key": "c" },
-      { "id": "upper_ring", "key": "r" },
-      { "id": "upper_pinky", "key": "l" }
+    "soundButtons": {
+      "upper": [
+        { "key": "g", "action": "right_hand_sound_upper_index" },
+        { "key": "c", "action": "right_hand_sound_upper_middle" },
+        { "key": "r", "action": "right_hand_sound_upper_ring" },
+        { "key": "l", "action": "right_hand_sound_upper_pinky" }
+      ],
+      "home": [
+        { "key": "h", "action": "right_hand_sound_home_index" },
+        { "key": "t", "action": "right_hand_sound_home_middle" },
+        { "key": "n", "action": "right_hand_sound_home_ring" },
+        { "key": "s", "action": "right_hand_sound_home_pinky" }
+      ],
+      "lower": [
+        { "key": "m", "action": "right_hand_sound_lower_index" },
+        { "key": "w", "action": "right_hand_sound_lower_middle" },
+        { "key": "v", "action": "right_hand_sound_lower_ring" },
+        { "key": "z", "action": "right_hand_sound_lower_pinky" }
+      ]
+    },
+    "octaveButtons": {
+      "increase": { "key": "=", "action": "increase_right_octave" },
+      "decrease": { "key": "-", "action": "decrease_right_octave" }
+    }
+  },
+  "global": {
+    "settings": [
+      { "key": "o", "action": "open_settings" }
     ],
-    "home": [
-      { "id": "home_index", "key": "h" },
-      { "id": "home_middle", "key": "t" },
-      { "id": "home_ring", "key": "n" },
-      { "id": "home_pinky", "key": "s" }
-    ],
-    "lower": [
-      { "id": "lower_index", "key": "m" },
-      { "id": "lower_middle", "key": "w" },
-      { "id": "lower_ring", "key": "v" },
-      { "id": "lower_pinky", "key": "z" }
+    "playback": [
+      { "key": "\\", "action": "panic_stop" },
+      { "key": "/", "action": "toggle_metronome" }
     ]
   }
 }

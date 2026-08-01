@@ -1,0 +1,57 @@
+{
+  "name": "Fei Actions",
+  "description": "All available actions in the Fei application",
+  "categories": {
+    "sound": {
+      "description": "Sound buttons - trigger musical notes",
+      "actions": [
+        "left_hand_sound_upper_pinky",
+        "left_hand_sound_upper_ring",
+        "left_hand_sound_upper_middle",
+        "left_hand_sound_upper_index",
+        "left_hand_sound_home_pinky",
+        "left_hand_sound_home_ring",
+        "left_hand_sound_home_middle",
+        "left_hand_sound_home_index",
+        "left_hand_sound_lower_pinky",
+        "left_hand_sound_lower_ring",
+        "left_hand_sound_lower_middle",
+        "left_hand_sound_lower_index",
+        "right_hand_sound_upper_index",
+        "right_hand_sound_upper_middle",
+        "right_hand_sound_upper_ring",
+        "right_hand_sound_upper_pinky",
+        "right_hand_sound_home_index",
+        "right_hand_sound_home_middle",
+        "right_hand_sound_home_ring",
+        "right_hand_sound_home_pinky",
+        "right_hand_sound_lower_index",
+        "right_hand_sound_lower_middle",
+        "right_hand_sound_lower_ring",
+        "right_hand_sound_lower_pinky"
+      ]
+    },
+    "octave": {
+      "description": "Octave control",
+      "actions": [
+        "increase_left_octave",
+        "decrease_left_octave",
+        "increase_right_octave",
+        "decrease_right_octave"
+      ]
+    },
+    "transport": {
+      "description": "Transport controls",
+      "actions": [
+        "toggle_metronome",
+        "panic_stop"
+      ]
+    },
+    "settings": {
+      "description": "Settings controls",
+      "actions": [
+        "open_settings"
+      ]
+    }
+  }
+}

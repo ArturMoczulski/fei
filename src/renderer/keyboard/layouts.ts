@@ -31,18 +31,48 @@ export function getLayout(type: KeyboardLayout): KeyMapping[] {
 
   for (const hand of ['leftHand', 'rightHand'] as const) {
     const handData = device[hand];
+    const handName = hand === 'leftHand' ? 'leftHand' : 'rightHand';
+
     for (const row of rows) {
-      const rowKeys = handData[row];
+      const rowKeys = handData.soundButtons[row];
       for (const keyData of rowKeys) {
-        const semitone = semitones[hand][keyData.id];
+        const semitone = semitones[handName][keyData.action];
         result.push({
           key: keyData.key,
           semitone,
           hand: hand === 'leftHand' ? 'left' : 'right',
           row,
-          fingerId: keyData.id,
+          action: keyData.action,
         });
       }
+    }
+
+    const octaveButtons = handData.octaveButtons;
+    for (const btn of ['increase', 'decrease'] as const) {
+      const keyData = octaveButtons[btn];
+      if (keyData) {
+        result.push({
+          key: keyData.key,
+          semitone: 0,
+          hand: hand === 'leftHand' ? 'left' : 'right',
+          row: btn,
+          action: keyData.action,
+        });
+      }
+    }
+  }
+
+  const globalActions = device.global;
+  for (const section of ['settings', 'playback'] as const) {
+    const actions = globalActions[section];
+    for (const keyData of actions) {
+      result.push({
+        key: keyData.key,
+        semitone: 0,
+        hand: 'left' as const,
+        row: section as 'upper' | 'home' | 'lower',
+        action: keyData.action,
+      });
     }
   }
 

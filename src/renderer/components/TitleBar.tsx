@@ -1,10 +1,13 @@
 import React from 'react';
+import { KeyBindingTooltip } from './KeyBindingTooltip';
+import type { KeyboardLayout } from '@shared/types';
 
 interface TitleBarProps {
   onSettingsClick: () => void;
+  keyboardLayout: KeyboardLayout;
 }
 
-function TitleBar({ onSettingsClick }: TitleBarProps) {
+function TitleBar({ onSettingsClick, keyboardLayout }: TitleBarProps) {
   const handleMinimize = () => window.electronAPI?.window.minimize();
   const handleMaximize = () => window.electronAPI?.window.maximize();
   const handleClose = () => window.electronAPI?.window.close();
@@ -17,12 +20,14 @@ function TitleBar({ onSettingsClick }: TitleBarProps) {
       </div>
 
       <div className="titlebar-controls">
-        <button className="titlebar-btn" onClick={onSettingsClick} title="Settings">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <circle cx="12" cy="12" r="3" />
-            <path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83" />
-          </svg>
-        </button>
+        <KeyBindingTooltip actions={['open_settings']} keyboardLayout={keyboardLayout}>
+          <button className="titlebar-btn" onClick={onSettingsClick} title="Settings">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="12" cy="12" r="3" />
+              <path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83" />
+            </svg>
+          </button>
+        </KeyBindingTooltip>
         <button className="titlebar-btn" onClick={handleMinimize} title="Minimize">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <line x1="5" y1="12" x2="19" y2="12" />

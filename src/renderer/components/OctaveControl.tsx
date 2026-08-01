@@ -1,13 +1,17 @@
 import React from 'react';
+import { KeyBindingTooltip } from './KeyBindingTooltip';
+import type { KeyboardLayout } from '@shared/types';
 
 interface OctaveControlProps {
   octave: number;
   onChange: (octave: number) => void;
   hand: 'left' | 'right';
+  keyboardLayout: KeyboardLayout;
 }
 
-function OctaveControl({ octave, onChange, hand }: OctaveControlProps) {
-  const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+function OctaveControl({ octave, onChange, hand, keyboardLayout }: OctaveControlProps) {
+  const decreaseAction = hand === 'left' ? 'decrease_left_octave' : 'decrease_right_octave';
+  const increaseAction = hand === 'left' ? 'increase_left_octave' : 'increase_right_octave';
 
   const decrementOctave = () => {
     if (octave > 1) {
@@ -23,21 +27,25 @@ function OctaveControl({ octave, onChange, hand }: OctaveControlProps) {
 
   return (
     <div className="octave-control">
-      <button
-        className="octave-btn"
-        onClick={decrementOctave}
-        disabled={octave <= 1}
-      >
-        ▼
-      </button>
+      <KeyBindingTooltip actions={[decreaseAction]} keyboardLayout={keyboardLayout}>
+        <button
+          className="octave-btn"
+          onClick={decrementOctave}
+          disabled={octave <= 1}
+        >
+          ▼
+        </button>
+      </KeyBindingTooltip>
       <span className="octave-display">C{octave}</span>
-      <button
-        className="octave-btn"
-        onClick={incrementOctave}
-        disabled={octave >= 7}
-      >
-        ▲
-      </button>
+      <KeyBindingTooltip actions={[increaseAction]} keyboardLayout={keyboardLayout}>
+        <button
+          className="octave-btn"
+          onClick={incrementOctave}
+          disabled={octave >= 7}
+        >
+          ▲
+        </button>
+      </KeyBindingTooltip>
     </div>
   );
 }

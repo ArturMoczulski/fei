@@ -64,6 +64,7 @@ function KeyboardHand({
         octave={baseOctave}
         onChange={onOctaveChange}
         hand={hand}
+        keyboardLayout={keyboardLayout}
       />
     </div>
   );
