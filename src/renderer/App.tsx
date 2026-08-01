@@ -84,7 +84,9 @@ function App() {
       const octave = mapping.hand === 'left' ? leftOctave : rightOctave;
       const note = semitoneToNote(mapping.semitone, selectedKey);
       const noteIndex = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'].indexOf(note);
-      const midiNumber = (octave + 1) * 12 + noteIndex;
+      const totalSemitones = selectedKey + mapping.semitone;
+      const octaveOffset = Math.floor(totalSemitones / 12);
+      const midiNumber = (octave + octaveOffset + 1) * 12 + noteIndex;
       const frequency = 440 * Math.pow(2, (midiNumber - 69) / 12);
 
       audioEngine.playNote(frequency, mapping.hand);
@@ -106,7 +108,9 @@ function App() {
       const octave = mapping.hand === 'left' ? leftOctave : rightOctave;
       const note = semitoneToNote(mapping.semitone, selectedKey);
       const noteIndex = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'].indexOf(note);
-      const midiNumber = (octave + 1) * 12 + noteIndex;
+      const totalSemitones = selectedKey + mapping.semitone;
+      const octaveOffset = Math.floor(totalSemitones / 12);
+      const midiNumber = (octave + octaveOffset + 1) * 12 + noteIndex;
       const frequency = 440 * Math.pow(2, (midiNumber - 69) / 12);
 
       audioEngine.stopNote(frequency, mapping.hand);

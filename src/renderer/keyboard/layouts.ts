@@ -57,3 +57,9 @@ export function semitoneToNote(semitone: number, keyNoteIndex: number): string {
   const noteIndex = (keyNoteIndex + semitone) % 12;
   return NOTES[noteIndex];
 }
+
+export function semitoneToMidiNote(semitone: number, octave: number, keyNoteIndex: number): number {
+  const noteIndex = (keyNoteIndex + semitone) % 12;
+  const midiNumber = (octave + 1) * 12 + noteIndex;
+  return midiNumber;
+}
