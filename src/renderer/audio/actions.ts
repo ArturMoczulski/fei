@@ -1,5 +1,5 @@
 import type { KeyMapping } from '@shared/types';
-import { audioEngine } from './audio/AudioEngine';
+import { audioEngine } from './AudioEngine';
 
 export interface ActionContext {
   pressedKeys: Set<string>;
@@ -17,19 +17,19 @@ export interface ActionContext {
 export function executeAction(action: string, mapping: KeyMapping, context: ActionContext): void {
   if (action.startsWith('left_hand_sound_') || action.startsWith('right_hand_sound_')) {
     executeSoundAction(mapping, context);
-  } else if (action === 'increase_left_octave') {
+  } else if (action === 'left_hand_increase_octave') {
     if (context.onLeftOctaveChange) {
       context.onLeftOctaveChange(context.leftOctave + 1);
     }
-  } else if (action === 'decrease_left_octave') {
+  } else if (action === 'left_hand_decrease_octave') {
     if (context.onLeftOctaveChange) {
       context.onLeftOctaveChange(context.leftOctave - 1);
     }
-  } else if (action === 'increase_right_octave') {
+  } else if (action === 'right_hand_increase_octave') {
     if (context.onRightOctaveChange) {
       context.onRightOctaveChange(context.rightOctave + 1);
     }
-  } else if (action === 'decrease_right_octave') {
+  } else if (action === 'right_hand_decrease_octave') {
     if (context.onRightOctaveChange) {
       context.onRightOctaveChange(context.rightOctave - 1);
     }

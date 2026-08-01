@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { getKeyBindingForAction } from '../keyboard/keyBindings';
 import type { KeyboardLayout } from '@shared/types';
 
@@ -11,7 +11,6 @@ interface KeyBindingTooltipProps {
 
 export function KeyBindingTooltip({ actions, keyboardLayout, children, className }: KeyBindingTooltipProps) {
   const [showTooltip, setShowTooltip] = useState(false);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const keyBindings = actions
     .map(action => {
@@ -25,13 +24,10 @@ export function KeyBindingTooltip({ actions, keyboardLayout, children, className
   }
 
   const handleMouseEnter = () => {
-    timeoutRef.current = setTimeout(() => setShowTooltip(true), 400);
+    setShowTooltip(true);
   };
 
   const handleMouseLeave = () => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
     setShowTooltip(false);
   };
 

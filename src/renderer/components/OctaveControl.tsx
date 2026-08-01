@@ -10,8 +10,8 @@ interface OctaveControlProps {
 }
 
 function OctaveControl({ octave, onChange, hand, keyboardLayout }: OctaveControlProps) {
-  const decreaseAction = hand === 'left' ? 'decrease_left_octave' : 'decrease_right_octave';
-  const increaseAction = hand === 'left' ? 'increase_left_octave' : 'increase_right_octave';
+  const decreaseAction = hand === 'left' ? 'left_hand_decrease_octave' : 'right_hand_decrease_octave';
+  const increaseAction = hand === 'left' ? 'left_hand_increase_octave' : 'right_hand_increase_octave';
 
   const decrementOctave = () => {
     if (octave > 1) {

@@ -6,6 +6,7 @@ import KeySelector from './components/KeySelector';
 import Metronome from './components/Metronome';
 import { KeyBindingTooltip } from './components/KeyBindingTooltip';
 import { audioEngine } from './audio/AudioEngine';
+import { isSoundAction } from './audio/actions';
 import { getLayout, getKeyDisplayKey, semitoneToNote } from './keyboard/layouts';
 import type { KeyboardLayout, KeyMapping } from '@shared/types';
 
@@ -53,6 +54,20 @@ function App() {
     setAudioReady(true);
   }, []);
 
+  const handleLeftOctaveChange = async (oct: number) => {
+    setLeftOctave(oct);
+    if (window.electronAPI) {
+      await window.electronAPI.settings.set('leftOctave', oct);
+    }
+  };
+
+  const handleRightOctaveChange = async (oct: number) => {
+    setRightOctave(oct);
+    if (window.electronAPI) {
+      await window.electronAPI.settings.set('rightOctave', oct);
+    }
+  };
+
   const getActiveNotes = useCallback((hand: 'left' | 'right') => {
     const layout = getLayout(keyboardLayout);
     const octave = hand === 'left' ? leftOctave : rightOctave;
@@ -84,18 +99,28 @@ function App() {
     if (mapping) {
       setPressedKeys(prev => new Set(prev).add(key));
 
-      const octave = mapping.hand === 'left' ? leftOctave : rightOctave;
-      const note = semitoneToNote(mapping.semitone, selectedKey);
-      const noteIndex = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'].indexOf(note);
-      const totalSemitones = selectedKey + mapping.semitone;
-      const octaveOffset = Math.floor(totalSemitones / 12);
-      const midiNumber = (octave + octaveOffset + 1) * 12 + noteIndex;
-      const frequency = 440 * Math.pow(2, (midiNumber - 69) / 12);
+      if (isSoundAction(mapping.action)) {
+        const octave = mapping.hand === 'left' ? leftOctave : rightOctave;
+        const note = semitoneToNote(mapping.semitone, selectedKey);
+        const noteIndex = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'].indexOf(note);
+        const totalSemitones = selectedKey + mapping.semitone;
+        const octaveOffset = Math.floor(totalSemitones / 12);
+        const midiNumber = (octave + octaveOffset + 1) * 12 + noteIndex;
+        const frequency = 440 * Math.pow(2, (midiNumber - 69) / 12);
 
-      activeFrequencies.set(key, frequency);
-      audioEngine.playNote(frequency, mapping.hand);
+        activeFrequencies.set(key, frequency);
+        audioEngine.playNote(frequency, mapping.hand);
+      } else if (mapping.action === 'left_hand_increase_octave') {
+        handleLeftOctaveChange(leftOctave + 1);
+      } else if (mapping.action === 'left_hand_decrease_octave') {
+        handleLeftOctaveChange(leftOctave - 1);
+      } else if (mapping.action === 'right_hand_increase_octave') {
+        handleRightOctaveChange(rightOctave + 1);
+      } else if (mapping.action === 'right_hand_decrease_octave') {
+        handleRightOctaveChange(rightOctave - 1);
+      }
     }
-  }, [keyboardLayout, leftOctave, rightOctave, selectedKey, audioReady, showSettings, initAudio, activeFrequencies]);
+  }, [keyboardLayout, leftOctave, rightOctave, selectedKey, audioReady, showSettings, initAudio, activeFrequencies, handleLeftOctaveChange, handleRightOctaveChange]);
 
   const handleKeyUp = useCallback((e: KeyboardEvent) => {
     const key = e.key.toLowerCase();
@@ -109,10 +134,12 @@ function App() {
         return next;
       });
 
-      const frequency = activeFrequencies.get(key);
-      if (frequency !== undefined) {
-        audioEngine.stopNote(frequency, mapping.hand);
-        activeFrequencies.delete(key);
+      if (isSoundAction(mapping.action)) {
+        const frequency = activeFrequencies.get(key);
+        if (frequency !== undefined) {
+          audioEngine.stopNote(frequency, mapping.hand);
+          activeFrequencies.delete(key);
+        }
       }
     }
   }, [keyboardLayout, activeFrequencies, pressedKeys]);
@@ -140,7 +167,7 @@ function App() {
 
       pressedKeys.forEach(key => {
         const mapping = layout.find((m: KeyMapping) => m.key === key);
-        if (mapping) {
+        if (mapping && isSoundAction(mapping.action)) {
           const octave = mapping.hand === 'left' ? leftOctave : rightOctave;
           const note = semitoneToNote(mapping.semitone, selectedKey);
           const noteIndex = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'].indexOf(note);
@@ -168,20 +195,6 @@ function App() {
     audioEngine.setVolume(vol);
     if (window.electronAPI) {
       await window.electronAPI.settings.set('volume', vol);
-    }
-  };
-
-  const handleLeftOctaveChange = async (oct: number) => {
-    setLeftOctave(oct);
-    if (window.electronAPI) {
-      await window.electronAPI.settings.set('leftOctave', oct);
-    }
-  };
-
-  const handleRightOctaveChange = async (oct: number) => {
-    setRightOctave(oct);
-    if (window.electronAPI) {
-      await window.electronAPI.settings.set('rightOctave', oct);
     }
   };
 

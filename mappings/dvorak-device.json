@@ -23,8 +23,8 @@
       ]
     },
     "octaveButtons": {
-      "increase": { "key": "]", "action": "increase_left_octave" },
-      "decrease": { "key": "[", "action": "decrease_left_octave" }
+      "increase": { "key": "4", "action": "left_hand_increase_octave" },
+      "decrease": { "key": "3", "action": "left_hand_decrease_octave" }
     }
   },
   "rightHand": {
@@ -49,8 +49,8 @@
       ]
     },
     "octaveButtons": {
-      "increase": { "key": "=", "action": "increase_right_octave" },
-      "decrease": { "key": "-", "action": "decrease_right_octave" }
+      "increase": { "key": "7", "action": "right_hand_increase_octave" },
+      "decrease": { "key": "8", "action": "right_hand_decrease_octave" }
     }
   },
   "global": {

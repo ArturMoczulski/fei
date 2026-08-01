@@ -34,10 +34,10 @@
     "octave": {
       "description": "Octave control",
       "actions": [
-        "increase_left_octave",
-        "decrease_left_octave",
-        "increase_right_octave",
-        "decrease_right_octave"
+        "left_hand_decrease_octave",
+        "left_hand_increase_octave",
+        "right_hand_decrease_octave",
+        "right_hand_increase_octave"
       ]
     },
     "transport": {
