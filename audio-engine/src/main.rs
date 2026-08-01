@@ -42,29 +42,29 @@ fn cmd_init_audio() -> Result<bool, String> {
 }
 
 #[tauri::command]
-fn cmd_play_note(semitone: i32, octave: i32, hand: String, selected_key: i32) {
+fn cmd_play_note(semitone: i32, octave: i32, _hand: String, selected_key: i32) {
     let frequency = calculate_frequency(semitone, octave, selected_key);
     let engine = AUDIO_ENGINE.lock();
-    engine.play_note(frequency, &hand);
+    engine.play_note(frequency);
 }
 
 #[tauri::command]
-fn cmd_stop_note(semitone: i32, octave: i32, hand: String, selected_key: i32) {
+fn cmd_stop_note(semitone: i32, octave: i32, _hand: String, selected_key: i32) {
     let frequency = calculate_frequency(semitone, octave, selected_key);
     let engine = AUDIO_ENGINE.lock();
-    engine.stop_note(frequency, &hand);
+    engine.stop_note(frequency);
 }
 
 #[tauri::command]
-fn cmd_play_note_raw(frequency: f32, hand: String) {
+fn cmd_play_note_raw(frequency: f32) {
     let engine = AUDIO_ENGINE.lock();
-    engine.play_note(frequency, &hand);
+    engine.play_note(frequency);
 }
 
 #[tauri::command]
-fn cmd_stop_note_raw(frequency: f32, hand: String) {
+fn cmd_stop_note_raw(frequency: f32) {
     let engine = AUDIO_ENGINE.lock();
-    engine.stop_note(frequency, &hand);
+    engine.stop_note(frequency);
 }
 
 #[tauri::command]
