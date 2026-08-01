@@ -9,10 +9,6 @@ class AudioEngine {
   async init(): Promise<void> {
     if (this.initialized) return;
 
-    const ctx = Tone.getContext().rawContext as AudioContext;
-    ctx.latencyHint = 'interactive';
-    ctx.lookAhead = 0;
-
     await Tone.start();
 
     Tone.context.lookAhead = 0;
@@ -21,9 +17,9 @@ class AudioEngine {
       oscillator: { type: 'triangle' },
       envelope: {
         attack: 0.001,
-        decay: 0.01,
-        sustain: 1.0,
-        release: 0.05,
+        decay: 0.1,
+        sustain: 0.7,
+        release: 0.3,
       },
       maxPolyphony: 128,
     }).toDestination();
@@ -32,9 +28,9 @@ class AudioEngine {
       oscillator: { type: 'triangle' },
       envelope: {
         attack: 0.001,
-        decay: 0.01,
-        sustain: 1.0,
-        release: 0.05,
+        decay: 0.1,
+        sustain: 0.7,
+        release: 0.3,
       },
       maxPolyphony: 128,
     }).toDestination();
