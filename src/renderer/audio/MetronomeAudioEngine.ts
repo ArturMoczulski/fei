@@ -38,8 +38,12 @@ class MetronomeAudioEngine {
     }
     this.currentBeat = 0;
 
-    Tone.Transport.stop();
-    Tone.Transport.cancel();
+    try {
+      Tone.Transport.cancel();
+    } catch (e) {
+      // Ignore
+    }
+
     Tone.Transport.bpm.value = this.bpm;
 
     const beats = Array.from({ length: this.timeSignature.numerator }, (_, i) => i);
@@ -63,20 +67,41 @@ class MetronomeAudioEngine {
 
   stop(): void {
     if (!this.isRunning) return;
-    Tone.Transport.stop();
-    Tone.Transport.cancel();
+    this.isRunning = false;
+
+    try {
+      if (Tone.Transport.state === 'started') {
+        Tone.Transport.stop(Tone.now(), true);
+      }
+    } catch (e) {
+      // Ignore transport errors
+    }
+
+    try {
+      Tone.Transport.cancel();
+    } catch (e) {
+      // Ignore cancel errors
+    }
+
     if (this.sequence) {
-      this.sequence.stop();
-      this.sequence.dispose();
+      try {
+        this.sequence.stop();
+      } catch (e) {
+        // Ignore stop errors
+      }
+      try {
+        this.sequence.dispose();
+      } catch (e) {
+        // Ignore dispose errors
+      }
       this.sequence = null;
     }
-    this.isRunning = false;
     this.currentBeat = 0;
   }
 
   setBpm(bpm: number): void {
-    this.bpm = bpm;
-    Tone.Transport.bpm.value = bpm;
+    this.bpm = Math.max(0.1, bpm);
+    Tone.Transport.bpm.value = this.bpm;
   }
 
   setTimeSignature(timeSignature: TimeSignature): void {

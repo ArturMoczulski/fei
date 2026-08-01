@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import TitleBar from './components/TitleBar';
 import KeyboardHand from './components/KeyboardHand';
 import SettingsModal from './components/SettingsModal';
@@ -21,6 +21,8 @@ function App() {
   const [pressedKeys, setPressedKeys] = useState<Set<string>>(new Set());
   const [showSettings, setShowSettings] = useState(false);
   const [audioReady, setAudioReady] = useState(false);
+  const [activeFrequencies] = useState<Map<string, number>>(new Map());
+  const isInitialKeyChange = useRef(true);
 
   useEffect(() => {
     const loadSettings = async () => {
@@ -89,9 +91,10 @@ function App() {
       const midiNumber = (octave + octaveOffset + 1) * 12 + noteIndex;
       const frequency = 440 * Math.pow(2, (midiNumber - 69) / 12);
 
+      activeFrequencies.set(key, frequency);
       audioEngine.playNote(frequency, mapping.hand);
     }
-  }, [keyboardLayout, leftOctave, rightOctave, selectedKey, audioReady, showSettings, initAudio]);
+  }, [keyboardLayout, leftOctave, rightOctave, selectedKey, audioReady, showSettings, initAudio, activeFrequencies]);
 
   const handleKeyUp = useCallback((e: KeyboardEvent) => {
     const key = e.key.toLowerCase();
@@ -105,17 +108,13 @@ function App() {
         return next;
       });
 
-      const octave = mapping.hand === 'left' ? leftOctave : rightOctave;
-      const note = semitoneToNote(mapping.semitone, selectedKey);
-      const noteIndex = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'].indexOf(note);
-      const totalSemitones = selectedKey + mapping.semitone;
-      const octaveOffset = Math.floor(totalSemitones / 12);
-      const midiNumber = (octave + octaveOffset + 1) * 12 + noteIndex;
-      const frequency = 440 * Math.pow(2, (midiNumber - 69) / 12);
-
-      audioEngine.stopNote(frequency, mapping.hand);
+      const frequency = activeFrequencies.get(key);
+      if (frequency !== undefined) {
+        audioEngine.stopNote(frequency, mapping.hand);
+        activeFrequencies.delete(key);
+      }
     }
-  }, [keyboardLayout, leftOctave, rightOctave, selectedKey]);
+  }, [keyboardLayout, activeFrequencies, pressedKeys]);
 
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);
@@ -126,6 +125,35 @@ function App() {
       window.removeEventListener('keyup', handleKeyUp);
     };
   }, [handleKeyDown, handleKeyUp]);
+
+  useEffect(() => {
+    if (isInitialKeyChange.current) {
+      isInitialKeyChange.current = false;
+      return;
+    }
+
+    if (pressedKeys.size > 0 && audioReady) {
+      const layout = getLayout(keyboardLayout);
+      audioEngine.stopAllNotes();
+      activeFrequencies.clear();
+
+      pressedKeys.forEach(key => {
+        const mapping = layout.find((m: KeyMapping) => m.key === key);
+        if (mapping) {
+          const octave = mapping.hand === 'left' ? leftOctave : rightOctave;
+          const note = semitoneToNote(mapping.semitone, selectedKey);
+          const noteIndex = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'].indexOf(note);
+          const totalSemitones = selectedKey + mapping.semitone;
+          const octaveOffset = Math.floor(totalSemitones / 12);
+          const midiNumber = (octave + octaveOffset + 1) * 12 + noteIndex;
+          const frequency = 440 * Math.pow(2, (midiNumber - 69) / 12);
+
+          activeFrequencies.set(key, frequency);
+          audioEngine.playNote(frequency, mapping.hand);
+        }
+      });
+    }
+  }, [selectedKey, keyboardLayout, leftOctave, rightOctave]);
 
   const handleLayoutChange = async (layout: KeyboardLayout) => {
     setKeyboardLayout(layout);
@@ -210,6 +238,14 @@ function App() {
             <span style={{ fontSize: '12px', minWidth: '30px' }}>{volume}dB</span>
           </div>
         </div>
+
+        <button
+          className="panic-btn"
+          onClick={() => audioEngine.panic()}
+          title="Stop all sounds"
+        >
+          ■
+        </button>
       </div>
 
       <div className="status-bar">
