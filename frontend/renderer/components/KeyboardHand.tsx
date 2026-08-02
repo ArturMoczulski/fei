@@ -78,6 +78,13 @@ function KeyboardHand({
       <div className="keymouse-header">
         {hand === 'left' ? (
           <div className="octave-controls-inline">
+            <button
+              className={`scale-lock-btn ${rearrangeKeys ? 'active' : ''}`}
+              onClick={() => setRearrangeKeys(!rearrangeKeys)}
+              title={rearrangeKeys ? 'Unlock scale arrangement' : 'Lock scale arrangement'}
+            >
+              {rearrangeKeys ? '🔒' : '🔓'}
+            </button>
             <select
               className="scale-select-small"
               value={currentScale}
@@ -87,13 +94,6 @@ function KeyboardHand({
                 <option key={value} value={value}>{label}</option>
               ))}
             </select>
-            <button
-              className={`scale-lock-btn ${rearrangeKeys ? 'active' : ''}`}
-              onClick={() => setRearrangeKeys(!rearrangeKeys)}
-              title={rearrangeKeys ? 'Unlock scale arrangement' : 'Lock scale arrangement'}
-            >
-              {rearrangeKeys ? '🔒' : '🔓'}
-            </button>
             <span className="octave-display-inline">Octave {baseOctave}</span>
             <KeyBindingTooltip actions={[decreaseAction]} keyboardLayout={keyboardLayout}>
               <button
