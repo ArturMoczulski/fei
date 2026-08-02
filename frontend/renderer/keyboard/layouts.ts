@@ -1,9 +1,7 @@
 import type { KeyboardLayout, KeyMapping, ScaleArrangement } from '@shared/types';
 import qwertyDevice from '../../mappings/qwerty-device.json';
-import qwertySemitones from '../../mappings/qwerty-semitones.json';
 import dvorakDevice from '../../mappings/dvorak-device.json';
-import dvorakSemitones from '../../mappings/dvorak-semitones.json';
-import { arrangeSemitonesByConsonance } from '../audio/scales';
+import { getSemitoneForAction } from '../audio/scales';
 
 const NOTES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 
@@ -25,34 +23,23 @@ export function isBlackKey(note: string): boolean {
 
 export function getLayout(type: KeyboardLayout, leftScaleArrangement: ScaleArrangement = 'chromatic', rightScaleArrangement: ScaleArrangement = 'chromatic'): KeyMapping[] {
   const device = type === 'dvorak' ? dvorakDevice : qwertyDevice;
-  const semitones = type === 'dvorak' ? dvorakSemitones : qwertySemitones;
   const result: KeyMapping[] = [];
 
   const rows = ['upper', 'home', 'lower'] as const;
 
   for (const hand of ['leftHand', 'rightHand'] as const) {
     const handData = device[hand];
-    const handName = hand === 'leftHand' ? 'leftHand' : 'rightHand';
-    const semitoneMap = semitones[handName as keyof typeof semitones] as Record<string, number>;
-    const scale = hand === 'leftHand' ? leftScaleArrangement : rightScaleArrangement;
-
-    const arrangedSemitones = arrangeSemitonesByConsonance([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], scale);
-
-    const upperRowSemitones = arrangedSemitones.slice(0, 4);
-    const homeRowSemitones = arrangedSemitones.slice(4, 8);
-    const lowerRowSemitones = arrangedSemitones.slice(8, 12);
-
-    const rowSemitones = { upper: upperRowSemitones, home: homeRowSemitones, lower: lowerRowSemitones };
+    const handName = hand === 'leftHand' ? 'left' : 'right';
+    const scaleArrangement = hand === 'leftHand' ? leftScaleArrangement : rightScaleArrangement;
 
     for (const row of rows) {
       const rowKeys = handData.soundButtons[row];
-      for (let i = 0; i < rowKeys.length; i++) {
-        const keyData = rowKeys[i];
-        const newSemitone = rowSemitones[row][i];
+      for (const keyData of rowKeys) {
+        const semitone = getSemitoneForAction(scaleArrangement, handName, keyData.action);
         result.push({
           key: keyData.key,
-          semitone: newSemitone,
-          hand: hand === 'leftHand' ? 'left' : 'right',
+          semitone,
+          hand: handName,
           row,
           action: keyData.action,
         });
@@ -66,7 +53,7 @@ export function getLayout(type: KeyboardLayout, leftScaleArrangement: ScaleArran
         result.push({
           key: keyData.key,
           semitone: 0,
-          hand: hand === 'leftHand' ? 'left' : 'right',
+          hand: handName,
           row: btn as 'upper' | 'home' | 'lower',
           action: keyData.action,
         });

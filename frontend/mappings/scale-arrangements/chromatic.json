@@ -1,0 +1,32 @@
+{
+  "name": "CHROMATIC",
+  "description": "Chromatic scale arrangement - root (0) at lower pinky, sequential semitones left-to-right, top-to-bottom",
+  "leftHand": {
+    "left_hand_sound_upper_pinky": 8,
+    "left_hand_sound_upper_ring": 9,
+    "left_hand_sound_upper_middle": 10,
+    "left_hand_sound_upper_index": 11,
+    "left_hand_sound_home_pinky": 4,
+    "left_hand_sound_home_ring": 5,
+    "left_hand_sound_home_middle": 6,
+    "left_hand_sound_home_index": 7,
+    "left_hand_sound_lower_pinky": 0,
+    "left_hand_sound_lower_ring": 1,
+    "left_hand_sound_lower_middle": 2,
+    "left_hand_sound_lower_index": 3
+  },
+  "rightHand": {
+    "right_hand_sound_upper_index": 11,
+    "right_hand_sound_upper_middle": 10,
+    "right_hand_sound_upper_ring": 9,
+    "right_hand_sound_upper_pinky": 8,
+    "right_hand_sound_home_index": 7,
+    "right_hand_sound_home_middle": 6,
+    "right_hand_sound_home_ring": 5,
+    "right_hand_sound_home_pinky": 4,
+    "right_hand_sound_lower_index": 3,
+    "right_hand_sound_lower_middle": 2,
+    "right_hand_sound_lower_ring": 1,
+    "right_hand_sound_lower_pinky": 0
+  }
+}
