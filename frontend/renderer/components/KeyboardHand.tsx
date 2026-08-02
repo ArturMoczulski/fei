@@ -30,8 +30,12 @@ function KeyboardHand({
   const currentScale = hand === 'left' ? leftScaleArrangement : rightScaleArrangement;
   const setScale = hand === 'left' ? setLeftScaleArrangement : setRightScaleArrangement;
 
+  const rows = ['upper', 'home', 'lower'] as const;
+  const rowMappings = rows.map(row => handMappings.filter(m => m.row === row));
+
   const getMappingAt = (row: number, col: number) => {
-    return handMappings[row * 4 + col];
+    const rowKeys = rowMappings[row];
+    return rowKeys[col] || null;
   };
 
   const decreaseAction = hand === 'left' ? 'left_hand_decrease_octave' : 'right_hand_decrease_octave';
