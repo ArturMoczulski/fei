@@ -114,3 +114,38 @@ describe('Frequency to key mapping logic', () => {
     expect(midiToNoteInOctave(74)).toBe(2);
   });
 });
+
+describe('Autoplay togglePlayPause logic', () => {
+  it('should do nothing if not playing', () => {
+    let state = { isPlaying: false, isPaused: false };
+    const togglePlayPause = () => {
+      if (!state.isPlaying) return;
+      state.isPaused ? state.isPaused = false : state.isPaused = true;
+    };
+    togglePlayPause();
+    expect(state.isPlaying).toBe(false);
+    expect(state.isPaused).toBe(false);
+  });
+
+  it('should pause if playing and not paused', () => {
+    let state = { isPlaying: true, isPaused: false };
+    const togglePlayPause = () => {
+      if (!state.isPlaying) return;
+      state.isPaused ? state.isPaused = false : state.isPaused = true;
+    };
+    togglePlayPause();
+    expect(state.isPlaying).toBe(true);
+    expect(state.isPaused).toBe(true);
+  });
+
+  it('should resume if playing and paused', () => {
+    let state = { isPlaying: true, isPaused: true };
+    const togglePlayPause = () => {
+      if (!state.isPlaying) return;
+      state.isPaused ? state.isPaused = false : state.isPaused = true;
+    };
+    togglePlayPause();
+    expect(state.isPlaying).toBe(true);
+    expect(state.isPaused).toBe(false);
+  });
+});

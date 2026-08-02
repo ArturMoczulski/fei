@@ -97,24 +97,28 @@ body {
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding: 16px;
-  gap: 16px;
+  padding: 8px 16px;
+  gap: 8px;
   overflow: hidden;
+  min-height: 0;
 }
 
-.autoplay-container {
-  position: absolute;
-  top: 56px;
-  right: 24px;
-  z-index: 10;
+.track-container {
+  flex-shrink: 0;
+  min-height: 100px;
+  overflow: hidden;
+  background: var(--surface);
+  width: 100%;
 }
 
 .hands-container {
   display: flex;
   gap: 32px;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
   flex: 1;
+  min-height: 0;
+  overflow-y: auto;
 }
 
 .hand-panel {
@@ -455,15 +459,33 @@ body {
 .footer {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 32px;
-  padding: 20px;
+  justify-content: space-between;
+  padding: 8px 16px;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+}
+
+.footer-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.footer-center {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.footer-right {
+  display: flex;
+  align-items: center;
 }
 
 .settings-row {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
 }
 
 .settings-label {
@@ -859,18 +881,18 @@ body {
 .autoplay {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .autoplay-btn {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  border: 2px solid var(--border);
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
   background: var(--surface);
   color: var(--text);
   cursor: pointer;
-  font-size: 18px;
+  font-size: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -889,10 +911,171 @@ body {
 }
 
 .autoplay-filename {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--text-muted);
-  max-width: 100px;
+  max-width: 80px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.midi-settings-modal {
+  min-width: 320px;
+}
+
+.midi-info {
+  background: var(--bg);
+  border-radius: 8px;
+  padding: 16px;
+  margin: 16px 0;
+}
+
+.midi-info-name {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  word-break: break-all;
+}
+
+.midi-info-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.midi-info-row:last-child {
+  border-bottom: none;
+}
+
+.midi-info-label {
+  color: var(--text-muted);
+}
+
+.midi-info-value {
+  font-weight: 500;
+}
+
+.midi-settings-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.midi-settings-btn {
+  flex: 1;
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: none;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.midi-settings-btn.apply {
+  background: var(--primary);
+  color: white;
+}
+
+.midi-settings-btn.apply:hover {
+  background: #6d28d9;
+}
+
+.midi-settings-btn.skip {
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.midi-settings-btn.skip:hover {
+  background: var(--surface-hover);
+}
+
+/* Transport */
+.transport {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  background: var(--surface);
+  border-radius: 6px;
+  border: 1px solid var(--border);
+}
+
+.transport-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.transport-btn:hover {
+  background: var(--surface-hover);
+  border-color: var(--primary);
+}
+
+.transport-btn.playing {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+
+.transport-bpm {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--text);
+  min-width: 60px;
+}
+
+.transport-time-sig {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--text-muted);
+  min-width: 35px;
+}
+
+.transport-position {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--secondary);
+  min-width: 80px;
+}
+
+/* Track View */
+.track-container {
+  flex-shrink: 0;
+  min-height: 100px;
+  overflow: hidden;
+  background: var(--surface);
+  width: 100%;
+}
+
+.track-view {
+  background: #0a0a0f;
+  width: 100%;
+  min-height: 100px;
+}
+
+.track-view svg {
+  display: block;
+}
+
+.track-view {
+  background: #0a0a0f;
+  width: 100%;
+  min-height: 120px;
+}
+
+.track-view svg {
+  display: block;
 }

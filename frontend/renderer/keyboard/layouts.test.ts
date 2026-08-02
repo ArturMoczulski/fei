@@ -38,9 +38,31 @@ describe('layouts', () => {
     it('should include global settings actions', () => {
       const layout = getLayout('dvorak');
       const settingsActions = layout.filter(m =>
-        m.action === 'open_settings' || m.action === 'toggle_actions_list' || m.action === 'panic_stop' || m.action === 'toggle_metronome'
+        m.action === 'open_settings' || m.action === 'toggle_actions_list' || m.action === 'panic_stop' || m.action === 'toggle_metronome' || m.action === 'toggle_autoplay'
       );
-      expect(settingsActions.length).toBe(4);
+      expect(settingsActions.length).toBe(5);
+    });
+
+    it('should include toggle_autoplay action in both layouts', () => {
+      const dvorakLayout = getLayout('dvorak');
+      const qwertyLayout = getLayout('qwerty');
+
+      const dvorakAutoplay = dvorakLayout.find(m => m.action === 'toggle_autoplay');
+      const qwertyAutoplay = qwertyLayout.find(m => m.action === 'toggle_autoplay');
+
+      expect(dvorakAutoplay).toBeDefined();
+      expect(qwertyAutoplay).toBeDefined();
+    });
+
+    it('should map space key to toggle_autoplay in both layouts', () => {
+      const dvorakLayout = getLayout('dvorak');
+      const qwertyLayout = getLayout('qwerty');
+
+      const dvorakSpace = dvorakLayout.find(m => m.key === ' ');
+      const qwertySpace = qwertyLayout.find(m => m.key === ' ');
+
+      expect(dvorakSpace?.action).toBe('toggle_autoplay');
+      expect(qwertySpace?.action).toBe('toggle_autoplay');
     });
 
     it('should return KeyMapping objects with required properties', () => {

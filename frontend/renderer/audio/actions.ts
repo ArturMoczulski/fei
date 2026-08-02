@@ -11,6 +11,7 @@ export interface ActionContext {
   onRightOctaveChange?: (oct: number) => void;
   onPanic?: () => void;
   onToggleMetronome?: () => void;
+  onToggleAutoplay?: () => void;
   onOpenSettings?: () => void;
 }
 
@@ -40,6 +41,10 @@ export function executeAction(action: string, mapping: KeyMapping, context: Acti
   } else if (action === 'toggle_metronome') {
     if (context.onToggleMetronome) {
       context.onToggleMetronome();
+    }
+  } else if (action === 'toggle_autoplay') {
+    if (context.onToggleAutoplay) {
+      context.onToggleAutoplay();
     }
   } else if (action === 'open_settings') {
     if (context.onOpenSettings) {

@@ -33,13 +33,6 @@ describe('Metronome', () => {
     expect(screen.queryByTitle('Start Metronome')).not.toBeInTheDocument();
   });
 
-  it('should have tempo preset options', () => {
-    render(<Metronome visible={true} />);
-
-    expect(screen.getByText('Largo (50)')).toBeInTheDocument();
-    expect(screen.getByText('Allegro (130)')).toBeInTheDocument();
-  });
-
   it('should display BPM input', () => {
     render(<Metronome visible={true} />);
 

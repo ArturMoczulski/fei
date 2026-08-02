@@ -1,20 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { metronomeAudioEngine, TimeSignature } from '../audio/MetronomeAudioEngine';
+import { useAppStore } from '../store/appStore';
 
 interface MetronomeProps {
   visible: boolean;
 }
-
-const TEMPO_PRESETS = [
-  { label: 'Largo', value: 50 },
-  { label: 'Adagio', value: 70 },
-  { label: 'Andante', value: 90 },
-  { label: 'Moderato', value: 110 },
-  { label: 'Allegro', value: 130 },
-  { label: 'Vivace', value: 145 },
-  { label: 'Presto', value: 170 },
-  { label: 'Prestissimo', value: 200 },
-];
 
 const TIME_SIGNATURES: TimeSignature[] = [
   { numerator: 2, denominator: 4 },
@@ -29,8 +19,10 @@ const TIME_SIGNATURES: TimeSignature[] = [
 
 function Metronome({ visible }: MetronomeProps) {
   const [isRunning, setIsRunning] = useState(false);
-  const [bpm, setBpm] = useState(110);
-  const [timeSignature, setTimeSignature] = useState<TimeSignature>({ numerator: 4, denominator: 4 });
+  const bpm = useAppStore(state => state.metronomeBpm);
+  const timeSignature = useAppStore(state => state.metronomeTimeSignature);
+  const setMetronomeBpm = useAppStore(state => state.setMetronomeBpm);
+  const setMetronomeTimeSignature = useAppStore(state => state.setMetronomeTimeSignature);
 
   useEffect(() => {
     metronomeAudioEngine.init();
@@ -46,22 +38,16 @@ function Metronome({ visible }: MetronomeProps) {
     }
   };
 
-  const handleTempoChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const newBpm = Number(e.target.value);
-    setBpm(newBpm);
-    await metronomeAudioEngine.setBpm(newBpm);
-  };
-
   const handleBpmInput = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const newBpm = Math.min(240, Math.max(20, Number(e.target.value)));
-    setBpm(newBpm);
+    setMetronomeBpm(newBpm);
     await metronomeAudioEngine.setBpm(newBpm);
   };
 
   const handleTimeSignatureChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
     const [num, denom] = e.target.value.split('/').map(Number);
     const newTimeSignature: TimeSignature = { numerator: num, denominator: denom };
-    setTimeSignature(newTimeSignature);
+    setMetronomeTimeSignature(newTimeSignature);
     await metronomeAudioEngine.setTimeSignature(newTimeSignature);
   };
 
@@ -76,18 +62,6 @@ function Metronome({ visible }: MetronomeProps) {
       >
         ♩
       </button>
-
-      <select
-        className="metronome-preset-select"
-        value={bpm}
-        onChange={handleTempoChange}
-      >
-        {TEMPO_PRESETS.map(preset => (
-          <option key={preset.value} value={preset.value}>
-            {preset.label} ({preset.value})
-          </option>
-        ))}
-      </select>
 
       <input
         type="number"

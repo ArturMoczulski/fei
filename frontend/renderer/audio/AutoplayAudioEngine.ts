@@ -9,6 +9,15 @@ export interface AutoplayNote {
   midi?: number;
 }
 
+export interface MidiMetadata {
+  name: string;
+  tempo: number;
+  timeSignature: { numerator: number; denominator: number };
+  keySignature: string | null;
+  duration: number;
+  trackCount: number;
+}
+
 export interface AutoplayState {
   isPlaying: boolean;
   isPaused: boolean;
@@ -48,6 +57,37 @@ class AutoplayAudioEngine {
   private pressedKeys: Set<string> = new Set();
   private allNotes: AutoplayNote[] = [];
   private keyMappingFn: ((frequency: number) => { key: string; hand: 'left' | 'right' } | null) | null = null;
+  private metadata: MidiMetadata | null = null;
+  private onPlayRequest: (() => void) | null = null;
+
+  async loadMidiMetadata(file: File): Promise<MidiMetadata> {
+    const arrayBuffer = await file.arrayBuffer();
+    this.midi = new Midi(arrayBuffer);
+
+    const header = this.midi.header;
+    const tempo = header.tempos.length > 0 ? Math.round(header.tempos[0].bpm) : 120;
+    const timeSignature = header.timeSignatures.length > 0
+      ? { numerator: header.timeSignatures[0].timeSignature[0], denominator: header.timeSignatures[0].timeSignature[1] }
+      : { numerator: 4, denominator: 4 };
+    const keySignature = header.keySignatures.length > 0
+      ? header.keySignatures[0].key
+      : null;
+
+    this.metadata = {
+      name: this.midi.name || file.name,
+      tempo,
+      timeSignature,
+      keySignature,
+      duration: this.midi.duration,
+      trackCount: this.midi.tracks.length,
+    };
+
+    return this.metadata;
+  }
+
+  getMetadata(): MidiMetadata | null {
+    return this.metadata;
+  }
 
   async loadMidi(file: File): Promise<{ duration: number; notes: AutoplayNote[] }> {
     const arrayBuffer = await file.arrayBuffer();
@@ -284,6 +324,24 @@ class AutoplayAudioEngine {
       return this.pausedTime;
     }
     return this.audioContext.currentTime - this.startTime;
+  }
+
+  togglePlayPause(): void {
+    if (!this.isPlaying) {
+      if (this.onPlayRequest) {
+        this.onPlayRequest();
+      }
+      return;
+    }
+    if (this.isPaused) {
+      this.resume();
+    } else {
+      this.pause();
+    }
+  }
+
+  setOnPlayRequest(callback: () => void): void {
+    this.onPlayRequest = callback;
   }
 }
 

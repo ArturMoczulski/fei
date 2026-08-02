@@ -1,7 +1,9 @@
 import { useEffect, useCallback, useRef } from 'react';
 import { useAppStore } from '../store/appStore';
+import { useTransportStore } from './useTransport';
 import { audioEngine } from '../audio/AudioEngine';
 import { metronomeAudioEngine } from '../audio/MetronomeAudioEngine';
+import { autoplayAudioEngine } from '../audio/AutoplayAudioEngine';
 import { calculateFrequency } from '../audio/actions';
 import { getLayout } from '../keyboard/layouts';
 import type { KeyMapping } from '@shared/types';
@@ -27,6 +29,8 @@ export function useKeyboardEvents() {
     addPressedKey,
     removePressedKey,
   } = useAppStore();
+
+  const { togglePlayPause, stop } = useTransportStore();
 
   const activeFrequenciesRef = useRef<Map<string, number>>(new Map());
 
@@ -56,6 +60,7 @@ export function useKeyboardEvents() {
 
     if (mapping.action === 'panic_stop') {
       audioEngine.panic();
+      stop();
       return;
     }
 
@@ -65,6 +70,11 @@ export function useKeyboardEvents() {
       } else {
         await metronomeAudioEngine.start(metronomeAudioEngine.getBpm(), metronomeAudioEngine.getTimeSignature());
       }
+      return;
+    }
+
+    if (mapping.action === 'toggle_autoplay') {
+      togglePlayPause();
       return;
     }
 
@@ -106,6 +116,8 @@ export function useKeyboardEvents() {
     setLeftOctave,
     setRightOctave,
     addPressedKey,
+    togglePlayPause,
+    stop,
   ]);
 
   const handleKeyUp = useCallback((e: KeyboardEvent) => {

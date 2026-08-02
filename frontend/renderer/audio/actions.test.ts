@@ -82,6 +82,7 @@ describe('actions', () => {
     it('should return false for transport actions', () => {
       expect(isSoundAction('panic_stop')).toBe(false);
       expect(isSoundAction('toggle_metronome')).toBe(false);
+      expect(isSoundAction('toggle_autoplay')).toBe(false);
     });
 
     it('should return false for settings actions', () => {

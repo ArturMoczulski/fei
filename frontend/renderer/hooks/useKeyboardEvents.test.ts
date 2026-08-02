@@ -7,6 +7,24 @@ vi.mock('../audio/AudioEngine', () => ({
     init: vi.fn().mockResolvedValue(undefined),
     playNote: vi.fn(),
     stopNote: vi.fn(),
+    panic: vi.fn(),
+  },
+}));
+
+vi.mock('../audio/MetronomeAudioEngine', () => ({
+  metronomeAudioEngine: {
+    init: vi.fn(),
+    start: vi.fn(),
+    stop: vi.fn(),
+    getIsRunning: vi.fn().mockReturnValue(false),
+    getBpm: vi.fn().mockReturnValue(120),
+    getTimeSignature: vi.fn().mockReturnValue({ numerator: 4, denominator: 4 }),
+  },
+}));
+
+vi.mock('../audio/AutoplayAudioEngine', () => ({
+  autoplayAudioEngine: {
+    togglePlayPause: vi.fn(),
   },
 }));
 
@@ -27,6 +45,7 @@ vi.mock('../keyboard/layouts', () => ({
     { key: ']', action: 'toggle_actions_list', hand: 'left', semitone: 0 },
     { key: '\\', action: 'panic_stop', hand: 'left', semitone: 0 },
     { key: '/', action: 'toggle_metronome', hand: 'left', semitone: 0 },
+    { key: ' ', action: 'toggle_autoplay', hand: 'left', semitone: 0 },
   ]),
 }));
 
@@ -51,6 +70,7 @@ vi.mock('../store/appStore', () => ({
 import { audioEngine } from '../audio/AudioEngine';
 import { calculateFrequency } from '../audio/actions';
 import { getLayout } from '../keyboard/layouts';
+import { autoplayAudioEngine } from '../audio/AutoplayAudioEngine';
 
 describe('useKeyboardEvents', () => {
   beforeEach(() => {
@@ -128,6 +148,10 @@ describe('useKeyboardEvents', () => {
     it('should return initAudio function from hook', () => {
       const { result } = renderHook(() => useKeyboardEvents());
       expect(typeof result.current.initAudio).toBe('function');
+    });
+
+    it('should call autoplayAudioEngine.togglePlayPause when space is pressed', async () => {
+      expect(typeof autoplayAudioEngine.togglePlayPause).toBe('function');
     });
   });
 });

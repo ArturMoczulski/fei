@@ -60,7 +60,8 @@
     ],
     "playback": [
       { "key": "\\", "action": "panic_stop" },
-      { "key": "/", "action": "toggle_metronome" }
+      { "key": "/", "action": "toggle_metronome" },
+      { "key": " ", "action": "toggle_autoplay" }
     ]
   }
 }

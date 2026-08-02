@@ -2,6 +2,15 @@ import { create } from 'zustand';
 import type { KeyboardLayout, ScaleArrangement } from '@shared/types';
 import { invoke } from '@tauri-apps/api/core';
 
+interface MidiMetadata {
+  name: string;
+  tempo: number;
+  timeSignature: { numerator: number; denominator: number };
+  keySignature: string | null;
+  duration: number;
+  trackCount: number;
+}
+
 interface AppState {
   keyboardLayout: KeyboardLayout;
   volume: number;
@@ -17,9 +26,14 @@ interface AppState {
   audioReady: boolean;
   pressedKeys: Set<string>;
   autoplayFile: File | null;
-  autoplayNotes: { key: string; hand: 'left' | 'right'; time: number; duration: number; frequency: number }[];
+  autoplayNotes: { key: string; hand: 'left' | 'right'; time: number; duration: number; frequency: number; midi?: number }[];
   autoplayIsPlaying: boolean;
   autoplayIsPaused: boolean;
+  showMidiSettings: boolean;
+  midiMetadata: MidiMetadata | null;
+  metronomeBpm: number;
+  metronomeTimeSignature: { numerator: number; denominator: number };
+  octaveIndicator: { left: 'none' | 'lower' | 'higher'; right: 'none' | 'lower' | 'higher' };
 
   setKeyboardLayout: (layout: KeyboardLayout) => void;
   setVolume: (volume: number) => void;
@@ -37,9 +51,14 @@ interface AppState {
   removePressedKey: (key: string) => void;
   isPressed: (key: string) => boolean;
   setAutoplayFile: (file: File | null) => void;
-  setAutoplayNotes: (notes: { key: string; hand: 'left' | 'right'; time: number; duration: number; frequency: number }[]) => void;
+  setAutoplayNotes: (notes: { key: string; hand: 'left' | 'right'; time: number; duration: number; frequency: number; midi?: number }[]) => void;
   setAutoplayIsPlaying: (playing: boolean) => void;
   setAutoplayIsPaused: (paused: boolean) => void;
+  setShowMidiSettings: (show: boolean) => void;
+  setMidiMetadata: (metadata: MidiMetadata | null) => void;
+  setMetronomeBpm: (bpm: number) => void;
+  setMetronomeTimeSignature: (ts: { numerator: number; denominator: number }) => void;
+  setOctaveIndicator: (indicator: { left: 'none' | 'lower' | 'higher'; right: 'none' | 'lower' | 'higher' }) => void;
 }
 
 export const useAppStore = create<AppState>((set, get) => ({
@@ -60,6 +79,11 @@ export const useAppStore = create<AppState>((set, get) => ({
   autoplayNotes: [],
   autoplayIsPlaying: false,
   autoplayIsPaused: false,
+  showMidiSettings: false,
+  midiMetadata: null,
+  metronomeBpm: 110,
+  metronomeTimeSignature: { numerator: 4, denominator: 4 },
+  octaveIndicator: { left: 'none', right: 'none' },
 
   setKeyboardLayout: (layout) => {
     set({ keyboardLayout: layout });
@@ -119,4 +143,9 @@ export const useAppStore = create<AppState>((set, get) => ({
   setAutoplayNotes: (notes) => set({ autoplayNotes: notes }),
   setAutoplayIsPlaying: (playing) => set({ autoplayIsPlaying: playing }),
   setAutoplayIsPaused: (paused) => set({ autoplayIsPaused: paused }),
+  setShowMidiSettings: (show) => set({ showMidiSettings: show }),
+  setMidiMetadata: (metadata) => set({ midiMetadata: metadata }),
+  setMetronomeBpm: (bpm) => set({ metronomeBpm: bpm }),
+  setMetronomeTimeSignature: (ts) => set({ metronomeTimeSignature: ts }),
+  setOctaveIndicator: (indicator) => set({ octaveIndicator: indicator }),
 }));

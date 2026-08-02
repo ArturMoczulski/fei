@@ -6,6 +6,10 @@ import ActionsListModal from './ActionsListModal';
 import KeySelector from './KeySelector';
 import Metronome from './Metronome';
 import Autoplay from './Autoplay';
+import MidiSettingsModal from './MidiSettingsModal';
+import Transport from './Transport';
+import TrackView from './TrackView';
+import { TransportController } from './TransportController';
 import { useAppStore } from '../store/appStore';
 import { getLayout, semitoneToNote } from '../keyboard/layouts';
 import type { KeyMapping } from '@shared/types';
@@ -21,7 +25,6 @@ export function AppUI() {
     selectedKey,
     showSettings,
     showActions,
-    audioReady,
     toggleSettings,
     toggleActions,
     setVolume,
@@ -46,6 +49,7 @@ export function AppUI() {
 
   return (
     <>
+      <TransportController />
       <TitleBar
         onSettingsClick={toggleSettings}
         onActionsClick={toggleActions}
@@ -53,8 +57,8 @@ export function AppUI() {
       />
 
       <div className="main-content">
-        <div className="autoplay-container">
-          <Autoplay />
+        <div className="track-container">
+          <TrackView />
         </div>
 
         <div className="hands-container">
@@ -77,34 +81,39 @@ export function AppUI() {
       </div>
 
       <div className="footer">
-        <KeySelector selectedKey={selectedKey} onChange={setSelectedKey} />
+        <div className="footer-left">
+          <Transport />
+          <Autoplay />
+        </div>
 
-        <Metronome visible={true} />
+        <div className="footer-center">
+          <KeySelector selectedKey={selectedKey} onChange={setSelectedKey} />
+          <Metronome visible={true} />
+        </div>
 
-        <div className="settings-row">
-          <span className="settings-label">Volume:</span>
-          <div className="volume-control">
-            <input
-              type="range"
-              className="volume-slider"
-              min="-40"
-              max="0"
-              value={volume}
-              onChange={(e) => setVolume(Number(e.target.value))}
-            />
-            <span style={{ fontSize: '12px', minWidth: '30px' }}>{volume}dB</span>
+        <div className="footer-right">
+          <div className="settings-row">
+            <span className="settings-label">Vol:</span>
+            <div className="volume-control">
+              <input
+                type="range"
+                className="volume-slider"
+                min="-40"
+                max="0"
+                value={volume}
+                onChange={(e) => setVolume(Number(e.target.value))}
+              />
+              <span style={{ fontSize: '12px', minWidth: '30px' }}>{volume}dB</span>
+            </div>
           </div>
         </div>
-      </div>
-
-      <div className="status-bar">
-        <span className="status-dot" />
-        <span>{audioReady ? 'Audio Ready' : 'Click any key to enable audio'}</span>
       </div>
 
       {showSettings && <SettingsModal />}
 
       {showActions && <ActionsListModal />}
+
+      <MidiSettingsModal />
     </>
   );
 }
