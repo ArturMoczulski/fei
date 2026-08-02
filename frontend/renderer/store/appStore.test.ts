@@ -9,6 +9,8 @@ describe('appStore', () => {
     store.setLeftOctave(3);
     store.setRightOctave(4);
     store.setSelectedKey(0);
+    store.setRearrangeKeysLeft(true);
+    store.setRearrangeKeysRight(true);
   });
 
   describe('initial state', () => {
@@ -183,6 +185,94 @@ describe('appStore', () => {
       useAppStore.getState().removePressedKey('g');
       expect(useAppStore.getState().isPressed('g')).toBe(false);
       expect(useAppStore.getState().isPressed('h')).toBe(true);
+    });
+  });
+
+  describe('scale arrangements', () => {
+    it('should have default scale arrangements as major', () => {
+      expect(useAppStore.getState().leftScaleArrangement).toBe('major');
+      expect(useAppStore.getState().rightScaleArrangement).toBe('major');
+    });
+
+    it('should set left scale arrangement', () => {
+      useAppStore.getState().setLeftScaleArrangement('natural_minor');
+      expect(useAppStore.getState().leftScaleArrangement).toBe('natural_minor');
+    });
+
+    it('should set right scale arrangement', () => {
+      useAppStore.getState().setRightScaleArrangement('harmonic_minor');
+      expect(useAppStore.getState().rightScaleArrangement).toBe('harmonic_minor');
+    });
+
+    it('should allow pentatonic scales', () => {
+      useAppStore.getState().setLeftScaleArrangement('pentatonic_major');
+      useAppStore.getState().setRightScaleArrangement('pentatonic_minor');
+      expect(useAppStore.getState().leftScaleArrangement).toBe('pentatonic_major');
+      expect(useAppStore.getState().rightScaleArrangement).toBe('pentatonic_minor');
+    });
+  });
+
+  describe('rearrangeKeys', () => {
+    it('should have rearrange keys enabled by default', () => {
+      expect(useAppStore.getState().rearrangeKeysLeft).toBe(true);
+      expect(useAppStore.getState().rearrangeKeysRight).toBe(true);
+    });
+
+    it('should set rearrange keys left', () => {
+      useAppStore.getState().setRearrangeKeysLeft(false);
+      expect(useAppStore.getState().rearrangeKeysLeft).toBe(false);
+    });
+
+    it('should set rearrange keys right', () => {
+      useAppStore.getState().setRearrangeKeysRight(false);
+      expect(useAppStore.getState().rearrangeKeysRight).toBe(false);
+    });
+
+    it('should toggle rearrange keys independently', () => {
+      useAppStore.getState().setRearrangeKeysLeft(false);
+      expect(useAppStore.getState().rearrangeKeysLeft).toBe(false);
+      expect(useAppStore.getState().rearrangeKeysRight).toBe(true);
+      useAppStore.getState().setRearrangeKeysRight(false);
+      expect(useAppStore.getState().rearrangeKeysLeft).toBe(false);
+      expect(useAppStore.getState().rearrangeKeysRight).toBe(false);
+    });
+  });
+
+  describe('autoplay state', () => {
+    it('should have no autoplay file initially', () => {
+      expect(useAppStore.getState().autoplayFile).toBeNull();
+    });
+
+    it('should not be playing initially', () => {
+      expect(useAppStore.getState().autoplayIsPlaying).toBe(false);
+    });
+
+    it('should not be paused initially', () => {
+      expect(useAppStore.getState().autoplayIsPaused).toBe(false);
+    });
+
+    it('should have empty autoplay notes initially', () => {
+      expect(useAppStore.getState().autoplayNotes).toEqual([]);
+    });
+
+    it('should set autoplay notes', () => {
+      const notes = [
+        { key: 'a', hand: 'right' as const, time: 0, duration: 1, frequency: 440 },
+        { key: 'b', hand: 'left' as const, time: 1, duration: 1, frequency: 523 },
+      ];
+      useAppStore.getState().setAutoplayNotes(notes);
+      expect(useAppStore.getState().autoplayNotes).toHaveLength(2);
+      expect(useAppStore.getState().autoplayNotes[0].key).toBe('a');
+    });
+
+    it('should set autoplay is playing', () => {
+      useAppStore.getState().setAutoplayIsPlaying(true);
+      expect(useAppStore.getState().autoplayIsPlaying).toBe(true);
+    });
+
+    it('should set autoplay is paused', () => {
+      useAppStore.getState().setAutoplayIsPaused(true);
+      expect(useAppStore.getState().autoplayIsPaused).toBe(true);
     });
   });
 });

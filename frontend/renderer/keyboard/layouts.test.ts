@@ -189,4 +189,33 @@ describe('layouts', () => {
       expect(commonKeys).toBeLessThan(dvorakLayout.length);
     });
   });
+
+  describe('getLayout with rearrange flags', () => {
+    it('should return 12 sound mappings per hand', () => {
+      const layout = getLayout('dvorak', 'major', 'major', true, true);
+
+      const leftSounds = layout.filter(m => m.hand === 'left' && m.action.startsWith('left_hand_sound'));
+      const rightSounds = layout.filter(m => m.hand === 'right' && m.action.startsWith('right_hand_sound'));
+
+      expect(leftSounds.length).toBe(12);
+      expect(rightSounds.length).toBe(12);
+    });
+
+    it('should have semitones in valid range 0-11', () => {
+      const layout = getLayout('dvorak', 'major', 'major', true, true);
+
+      const leftSounds = layout.filter(m => m.hand === 'left' && m.action.startsWith('left_hand_sound'));
+      leftSounds.forEach((m: KeyMapping) => {
+        expect(m.semitone).toBeGreaterThanOrEqual(0);
+        expect(m.semitone).toBeLessThanOrEqual(11);
+      });
+    });
+
+    it('should include octave controls', () => {
+      const layout = getLayout('dvorak', 'major', 'major', true, true);
+
+      const octaveActions = layout.filter(m => m.action.includes('octave'));
+      expect(octaveActions.length).toBe(4);
+    });
+  });
 });
