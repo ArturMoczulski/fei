@@ -98,9 +98,9 @@ fn cmd_is_audio_ready() -> bool {
 }
 
 #[tauri::command]
-fn cmd_metronome_start(bpm: u32) {
+fn cmd_metronome_start(bpm: u32, numerator: u32) {
     let engine = AUDIO_ENGINE.lock();
-    engine.metronome_start(bpm);
+    engine.metronome_start(bpm, numerator);
 }
 
 #[tauri::command]

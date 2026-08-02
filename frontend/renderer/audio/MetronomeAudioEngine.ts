@@ -22,7 +22,7 @@ class MetronomeAudioEngine {
     }
     this.isRunning = true;
     try {
-      await invoke('cmd_metronome_start', { bpm: this.bpm });
+      await invoke('cmd_metronome_start', { bpm: this.bpm, numerator: this.timeSignature.numerator });
     } catch (e) {
       console.error('invoke cmd_metronome_start failed:', e);
     }

@@ -12,6 +12,7 @@ use std::time::Duration;
 
 const MAX_POLYPHONY: usize = 128;
 const METRONOME_FREQUENCY: f32 = 1000.0;
+const METRONOME_ACCENT_FREQUENCY: f32 = 1500.0;
 
 pub enum AudioCommand {
     NoteOn { frequency: f32 },
@@ -19,7 +20,7 @@ pub enum AudioCommand {
     SetVolume(f32),
     StopAll,
     Panic,
-    MetronomeTick { frequency: f32 },
+    MetronomeTick { frequency: f32, is_downbeat: bool },
 }
 
 pub struct AudioEngine {
@@ -117,7 +118,7 @@ impl AudioEngine {
                     AudioCommand::Panic => {
                         panic_cmd.store(true, Ordering::SeqCst);
                     }
-                    AudioCommand::MetronomeTick { frequency } => {
+                    AudioCommand::MetronomeTick { frequency, is_downbeat: _ } => {
                         let mut metro = metronome_voice_cmd.lock().unwrap();
                         metro.trigger_click(frequency);
                     }
@@ -265,7 +266,7 @@ impl AudioEngine {
         self.initialized.load(Ordering::SeqCst)
     }
 
-    pub fn metronome_start(&self, bpm: u32) {
+    pub fn metronome_start(&self, bpm: u32, numerator: u32) {
         if !self.initialized.load(Ordering::SeqCst) {
             return;
         }
@@ -280,12 +281,14 @@ impl AudioEngine {
         };
 
         let metronome_freq = METRONOME_FREQUENCY;
+        let metronome_accent_freq = METRONOME_ACCENT_FREQUENCY;
         let interval_ms = (60000.0 / bpm as f64) as u64;
 
         let running_flag = self.metronome_running.clone();
         self.metronome_running.store(true, Ordering::SeqCst);
 
         let handle = std::thread::spawn(move || {
+            let mut beat: u32 = 0;
             loop {
                 if !running_flag.load(Ordering::SeqCst) {
                     break;
@@ -294,7 +297,10 @@ impl AudioEngine {
                 if !running_flag.load(Ordering::SeqCst) {
                     break;
                 }
-                if tx.send(AudioCommand::MetronomeTick { frequency: metronome_freq }).is_err() {
+                beat = (beat % numerator) + 1;
+                let is_downbeat = beat == 1;
+                let freq = if is_downbeat { metronome_accent_freq } else { metronome_freq };
+                if tx.send(AudioCommand::MetronomeTick { frequency: freq, is_downbeat }).is_err() {
                     break;
                 }
             }
@@ -350,9 +356,12 @@ mod tests {
 
     #[test]
     fn test_audio_command_metronome_tick() {
-        let cmd = AudioCommand::MetronomeTick { frequency: 1000.0 };
+        let cmd = AudioCommand::MetronomeTick { frequency: 1000.0, is_downbeat: true };
         match cmd {
-            AudioCommand::MetronomeTick { frequency } => assert_eq!(frequency, 1000.0),
+            AudioCommand::MetronomeTick { frequency, is_downbeat } => {
+                assert_eq!(frequency, 1000.0);
+                assert!(is_downbeat);
+            }
             _ => panic!("Expected MetronomeTick"),
         }
     }
@@ -383,7 +392,7 @@ mod tests {
         engine.initialized.store(true, Ordering::SeqCst);
         let (tx, _rx) = std::sync::mpsc::channel();
         engine.command_tx = Some(tx);
-        engine.metronome_start(120);
+        engine.metronome_start(120, 4);
         assert!(engine.metronome_running.load(Ordering::SeqCst));
         engine.metronome_stop();
         assert!(!engine.metronome_running.load(Ordering::SeqCst));
@@ -395,9 +404,9 @@ mod tests {
         engine.initialized.store(true, Ordering::SeqCst);
         let (tx, _rx) = std::sync::mpsc::channel();
         engine.command_tx = Some(tx);
-        engine.metronome_start(120);
+        engine.metronome_start(120, 4);
         assert!(engine.metronome_running.load(Ordering::SeqCst));
-        engine.metronome_start(60);
+        engine.metronome_start(60, 4);
         assert!(engine.metronome_running.load(Ordering::SeqCst));
         engine.metronome_stop();
     }
@@ -410,7 +419,7 @@ mod tests {
         let original_tx = engine.command_tx.take();
         engine.command_tx = Some(tx);
 
-        engine.metronome_start(600);
+        engine.metronome_start(600, 4);
         std::thread::sleep(Duration::from_millis(50));
         engine.metronome_stop();
         std::thread::sleep(Duration::from_millis(50));
