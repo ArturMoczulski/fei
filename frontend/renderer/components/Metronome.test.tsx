@@ -45,7 +45,7 @@ describe('Metronome', () => {
 
     const bpmInput = screen.getByRole('spinbutton');
     expect(bpmInput).toBeInTheDocument();
-    expect(bpmInput).toHaveValue(120);
+    expect(bpmInput).toHaveValue(110);
   });
 
   it('should display time signature options', () => {

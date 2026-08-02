@@ -9,10 +9,6 @@ interface TitleBarProps {
 }
 
 function TitleBar({ onSettingsClick, onActionsClick, keyboardLayout }: TitleBarProps) {
-  const handleMinimize = () => window.electronAPI?.window.minimize();
-  const handleMaximize = () => window.electronAPI?.window.maximize();
-  const handleClose = () => window.electronAPI?.window.close();
-
   return (
     <div className="titlebar">
       <div className="titlebar-left">
@@ -31,22 +27,6 @@ function TitleBar({ onSettingsClick, onActionsClick, keyboardLayout }: TitleBarP
         </KeyBindingTooltip>
         <button className="titlebar-btn" onClick={onActionsClick} title="Actions">
           ?
-        </button>
-        <button className="titlebar-btn" onClick={handleMinimize} title="Minimize">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <line x1="5" y1="12" x2="19" y2="12" />
-          </svg>
-        </button>
-        <button className="titlebar-btn" onClick={handleMaximize} title="Maximize">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <rect x="4" y="4" width="16" height="16" rx="2" />
-          </svg>
-        </button>
-        <button className="titlebar-btn close" onClick={handleClose} title="Close">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <line x1="18" y1="6" x2="6" y2="18" />
-            <line x1="6" y1="6" x2="18" y2="18" />
-          </svg>
         </button>
       </div>
     </div>
