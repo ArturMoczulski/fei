@@ -93,3 +93,12 @@ export function semitonesToInterval(semitones: number): string {
 export function isInScale(semitone: number, scaleArrangement: ScaleArrangement): boolean {
   return SCALE_NOTES[scaleArrangement].includes(semitone);
 }
+
+export function getSemitoneLabel(semitone: number, scaleArrangement: ScaleArrangement): string {
+  const arrangement = SCALE_ARRANGEMENTS[scaleArrangement];
+  const labels = (arrangement as { labels?: string[] }).labels;
+  if (labels && labels[semitone] !== undefined) {
+    return labels[semitone] || '';
+  }
+  return '';
+}

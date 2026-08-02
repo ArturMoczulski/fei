@@ -1,6 +1,7 @@
 {
   "name": "HARMONIC_MINOR",
-  "description": "Harmonic minor scale arrangement - root (0) at home index. Home row: 0,3,5,7. Upper row: 8,11,2,4. Lower row: 1,6,9,10",
+  "description": "Harmonic minor scale - root (0) at home index. Labels: Key, Pass, Warm, Color, Tense, Conson, Bright, Resolve",
+  "labels": ["Key", "Pass", "Warm", "Color", "Tense", "Conson", "", "Bright", "Resolve", "", "", ""],
   "leftHand": {
     "left_hand_sound_upper_pinky": 4,
     "left_hand_sound_upper_ring": 2,

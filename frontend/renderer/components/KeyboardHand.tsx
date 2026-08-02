@@ -4,7 +4,7 @@ import { useAppStore } from '../store/appStore';
 import type { KeyboardLayout, ScaleArrangement } from '@shared/types';
 import { SCALE_ARRANGEMENT_DISPLAY } from '@shared/types';
 import { getLayout, getKeyDisplayKey, semitoneToNote } from '../keyboard/layouts';
-import { semitonesToInterval, isInScale } from '../audio/scales';
+import { semitonesToInterval, isInScale, getSemitoneLabel } from '../audio/scales';
 
 interface KeyboardHandProps {
   hand: 'left' | 'right';
@@ -165,18 +165,20 @@ function KeyboardHand({
               const noteName = semitoneToNote(mapping.semitone, selectedKey);
               const frequency = calculateFrequency(mapping.semitone, baseOctave);
               const inScale = isInScale(mapping.semitone, currentScale);
+              const semitoneLabel = getSemitoneLabel(mapping.semitone, currentScale);
               return (
                 <button
                   key={mapping.key}
                   className={`key-button ${pressed ? 'pressed' : ''} ${inScale ? 'in-scale' : ''}`}
                 >
-                  <div className="key-button-grid">
+                    <div className="key-button-grid">
                     <div className="key-info note-name">{noteName}</div>
                     <div className="key-info interval">+{mapping.semitone}</div>
-                    <div className="key-info interval-step">{mapping.semitone === 0 ? 'key' : semitonesToInterval(mapping.semitone)}</div>
                     <div className="key-info frequency">{frequency.toFixed(0)}Hz</div>
+                    <div className="key-info interval-step">{mapping.semitone === 0 ? 'key' : semitonesToInterval(mapping.semitone)}</div>
                     <div className="key-center">
                       <span className="key-hint">{getKeyDisplayKey(mapping, keyboardLayout)}</span>
+                      {semitoneLabel && <div className="key-hint-label">{semitoneLabel}</div>}
                     </div>
                   </div>
                 </button>

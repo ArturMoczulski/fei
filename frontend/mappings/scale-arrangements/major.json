@@ -1,6 +1,7 @@
 {
   "name": "MAJOR",
-  "description": "Major scale arrangement - root (0) at home index. Home row: 0,2,4,5. Upper row: 7,9,11,1. Lower row: 3,6,8,10",
+  "description": "Major scale - root (0) at home index. Labels: Key, Pass, Bright, Color, Tense, Conson, Warm, Resolve",
+  "labels": ["Key", "Pass", "Bright", "Color", "Tense", "Conson", "Warm", "Resolve"],
   "leftHand": {
     "left_hand_sound_upper_pinky": 1,
     "left_hand_sound_upper_ring": 11,

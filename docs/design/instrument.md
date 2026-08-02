@@ -143,5 +143,42 @@ The built-in metronome provides:
 Each sound button displays:
 - **Key label**: The physical keys to press (`QWERTY / DVORAK`)
 - **Note name**: The musical note at current octave and key setting (e.g., C, D#, F#)
+- **Semantic label**: Functional role of the interval in the melody (e.g., Key, Pass, Warm, Color, Tense, Conson, Bright, Resolve)
 - **Interval**: Semitone offset from the lowest note (+0 to +11)
 - **Frequency**: The actual Hz value of the note at current settings
+
+## Semantic Labels
+
+Each semitone in a scale has a **semantic label** that describes its musical function in melody:
+
+| Label | Meaning |
+|-------|---------|
+| **Key** | The tonal center/root of the scale |
+| **Pass** | Passing tone, used for movement between stable notes |
+| **Warm** | Adds warmth and color to the melody |
+| **Color** | Gives character and distinctiveness |
+| **Tense** | Creates tension, wants to resolve |
+| **Conson** | Stable, consonant interval |
+| **Bright** | Adds brightness and energy |
+| **Resolve** | Strong tension that wants to resolve to the root |
+
+### Major Scale Labels
+- 0 (Key), 2 (Pass), 4 (Bright), 5 (Color), 7 (Tense), 9 (Conson), 11 (Warm), 12/0 (Resolve)
+
+### Minor Scale Labels
+- 0 (Key), 2 (Pass), 3 (Warm), 5 (Conson), 7 (Tense), 8 (Bright), 10 (Resolve)
+
+### Pentatonic Scales
+Pentatonic scales have fewer notes and simpler label patterns focused on the most consonant intervals.
+
+## Scale Arrangement
+
+### Default (Chromatic)
+When no scale rearrangement is applied, keys map sequentially (0-11) regardless of scale selection. The scale selection only affects **highlighting** of notes that are within the chosen scale.
+
+### Rearranged (Scale Lock Enabled)
+When the **Scale Lock** is enabled (🔒), keys are rearranged according to the selected scale's ergonomics, placing scale notes in more natural hand positions.
+
+This separation allows:
+- **Visual feedback**: See which keys are "in scale" via green highlighting
+- **Flexible playing**: Use chromatic mapping for maximum range or scale mapping for ergonomic patterns

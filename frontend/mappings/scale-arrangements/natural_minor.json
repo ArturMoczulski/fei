@@ -1,6 +1,7 @@
 {
   "name": "NATURAL_MINOR",
-  "description": "Natural minor scale arrangement - root (0) at home index. Home row: 0,3,5,7. Upper row: 8,10,11,2. Lower row: 1,4,6,9",
+  "description": "Natural minor scale - root (0) at home index. Labels: Key, Pass, Warm, Color, Tense, Conson, Bright, Resolve",
+  "labels": ["Key", "Pass", "Warm", "Color", "Tense", "Conson", "", "Bright", "Resolve", "", "Pass", ""],
   "leftHand": {
     "left_hand_sound_upper_pinky": 2,
     "left_hand_sound_upper_ring": 11,
