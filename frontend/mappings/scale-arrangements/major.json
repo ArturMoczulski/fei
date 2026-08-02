@@ -1,7 +1,7 @@
 {
   "name": "MAJOR",
-  "description": "Major scale - root (0) at home index. Labels: Key, Pass, Bright, Color, Tense, Conson, Warm, Resolve",
-  "labels": ["Key", "Pass", "Bright", "Color", "Tense", "Conson", "Warm", "Resolve"],
+  "description": "Major scale - root (0) at home index. Degrees: 1, 2, 3, 4, 5, 6, 7",
+  "labels": ["Key", "", "Pass", "", "Bright", "Conson", "", "Conson", "", "Bright", "", "Warm"],
   "leftHand": {
     "left_hand_sound_upper_pinky": 1,
     "left_hand_sound_upper_ring": 11,

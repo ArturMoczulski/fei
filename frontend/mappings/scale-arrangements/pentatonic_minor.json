@@ -1,7 +1,7 @@
 {
   "name": "PENTATONIC_MINOR",
-  "description": "Pentatonic minor scale - root (0) at home index. Labels: Key, Pass, Warm, Conson, Bright",
-  "labels": ["Key", "Pass", "", "Warm", "", "Conson", "", "Bright", "Pass", "", "Pass", ""],
+  "description": "Pentatonic minor scale - root (0) at home index. Degrees: 1, b3, 4, 5, b7",
+  "labels": ["Key", "", "", "Warm", "", "Conson", "", "Bright", "", "Pass", "", "Resolve"],
   "leftHand": {
     "left_hand_sound_upper_pinky": 6,
     "left_hand_sound_upper_ring": 4,

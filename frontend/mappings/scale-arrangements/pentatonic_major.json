@@ -1,7 +1,7 @@
 {
   "name": "PENTATONIC_MAJOR",
-  "description": "Pentatonic major scale - root (0) at home index. Labels: Key, Pass, Warm, Bright, Conson",
-  "labels": ["Key", "Pass", "Warm", "", "Bright", "", "", "Conson", "", "Pass", "", ""],
+  "description": "Pentatonic major scale - root (0) at home index. Degrees: 1, 2, 3, 5, 6",
+  "labels": ["Key", "", "Pass", "", "Warm", "", "", "Conson", "", "Bright", "", ""],
   "leftHand": {
     "left_hand_sound_upper_pinky": 6,
     "left_hand_sound_upper_ring": 5,

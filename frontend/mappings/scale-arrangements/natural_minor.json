@@ -1,7 +1,7 @@
 {
   "name": "NATURAL_MINOR",
-  "description": "Natural minor scale - root (0) at home index. Labels: Key, Pass, Warm, Color, Tense, Conson, Bright, Resolve",
-  "labels": ["Key", "Pass", "Warm", "Color", "Tense", "Conson", "", "Bright", "Resolve", "", "Pass", ""],
+  "description": "Natural minor scale - root (0) at home index. Degrees: 1, 2, b3, 4, 5, b6, b7",
+  "labels": ["Key", "", "Pass", "Warm", "", "Conson", "", "Tense", "Bright", "", "Resolve", ""],
   "leftHand": {
     "left_hand_sound_upper_pinky": 2,
     "left_hand_sound_upper_ring": 11,
