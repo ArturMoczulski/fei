@@ -5,6 +5,7 @@ use cpal::SampleFormat;
 use log::{error, info};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::mpsc::{channel, Receiver, Sender};
+use std::sync::Mutex;
 use std::thread;
 use std::sync::Arc;
 use std::time::Duration;
@@ -26,6 +27,7 @@ pub struct AudioEngine {
     initialized: AtomicBool,
     volume: f32,
     metronome_running: Arc<AtomicBool>,
+    metronome_thread: Mutex<Option<std::thread::JoinHandle<()>>>,
 }
 
 impl AudioEngine {
@@ -35,6 +37,7 @@ impl AudioEngine {
             initialized: AtomicBool::new(false),
             volume: 0.5,
             metronome_running: Arc::new(AtomicBool::new(false)),
+            metronome_thread: Mutex::new(None),
         }
     }
 
@@ -282,7 +285,7 @@ impl AudioEngine {
         let running_flag = self.metronome_running.clone();
         self.metronome_running.store(true, Ordering::SeqCst);
 
-        std::thread::spawn(move || {
+        let handle = std::thread::spawn(move || {
             loop {
                 if !running_flag.load(Ordering::SeqCst) {
                     break;
@@ -296,10 +299,15 @@ impl AudioEngine {
                 }
             }
         });
+
+        *self.metronome_thread.lock().unwrap() = Some(handle);
     }
 
     pub fn metronome_stop(&self) {
         self.metronome_running.store(false, Ordering::SeqCst);
+        if let Some(handle) = self.metronome_thread.lock().unwrap().take() {
+            let _ = handle.join();
+        }
     }
 }
 
