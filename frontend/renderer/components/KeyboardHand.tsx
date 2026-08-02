@@ -87,14 +87,13 @@ function KeyboardHand({
                 <option key={value} value={value}>{label}</option>
               ))}
             </select>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '10px' }}>
-              <input
-                type="checkbox"
-                checked={rearrangeKeys}
-                onChange={(e) => setRearrangeKeys(e.target.checked)}
-              />
-              Rearrange
-            </label>
+            <button
+              className={`scale-lock-btn ${rearrangeKeys ? 'active' : ''}`}
+              onClick={() => setRearrangeKeys(!rearrangeKeys)}
+              title={rearrangeKeys ? 'Unlock scale arrangement' : 'Lock scale arrangement'}
+            >
+              {rearrangeKeys ? '🔒' : '🔓'}
+            </button>
             <span className="octave-display-inline">Octave {baseOctave}</span>
             <KeyBindingTooltip actions={[decreaseAction]} keyboardLayout={keyboardLayout}>
               <button
@@ -145,14 +144,13 @@ function KeyboardHand({
                 <option key={value} value={value}>{label}</option>
               ))}
             </select>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '10px' }}>
-              <input
-                type="checkbox"
-                checked={rearrangeKeys}
-                onChange={(e) => setRearrangeKeys(e.target.checked)}
-              />
-              Rearrange
-            </label>
+            <button
+              className={`scale-lock-btn ${rearrangeKeys ? 'active' : ''}`}
+              onClick={() => setRearrangeKeys(!rearrangeKeys)}
+              title={rearrangeKeys ? 'Unlock scale arrangement' : 'Lock scale arrangement'}
+            >
+              {rearrangeKeys ? '🔒' : '🔓'}
+            </button>
           </div>
         )}
       </div>
