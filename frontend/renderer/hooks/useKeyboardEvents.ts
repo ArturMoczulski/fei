@@ -14,6 +14,8 @@ export function useKeyboardEvents() {
     rightOctave,
     leftScaleArrangement,
     rightScaleArrangement,
+    rearrangeKeysLeft,
+    rearrangeKeysRight,
     selectedKey,
     showSettings,
     audioReady,
@@ -37,7 +39,7 @@ export function useKeyboardEvents() {
     if (e.repeat) return;
 
     const key = e.key.toLowerCase();
-    const layout = getLayout(keyboardLayout, leftScaleArrangement, rightScaleArrangement);
+    const layout = getLayout(keyboardLayout, leftScaleArrangement, rightScaleArrangement, rearrangeKeysLeft, rearrangeKeysRight);
     const mapping = layout.find((m: KeyMapping) => m.key.toLowerCase() === key);
 
     if (!mapping) return;
@@ -91,6 +93,8 @@ export function useKeyboardEvents() {
     keyboardLayout,
     leftScaleArrangement,
     rightScaleArrangement,
+    rearrangeKeysLeft,
+    rearrangeKeysRight,
     showSettings,
     audioReady,
     initAudio,
@@ -106,7 +110,7 @@ export function useKeyboardEvents() {
 
   const handleKeyUp = useCallback((e: KeyboardEvent) => {
     const key = e.key.toLowerCase();
-    const layout = getLayout(keyboardLayout, leftScaleArrangement, rightScaleArrangement);
+    const layout = getLayout(keyboardLayout, leftScaleArrangement, rightScaleArrangement, rearrangeKeysLeft, rearrangeKeysRight);
     const mapping = layout.find((m: KeyMapping) => m.key.toLowerCase() === key);
 
     if (mapping && isSoundAction(mapping.action)) {
@@ -117,7 +121,7 @@ export function useKeyboardEvents() {
         activeFrequenciesRef.current.delete(key);
       }
     }
-  }, [keyboardLayout, leftScaleArrangement, rightScaleArrangement, removePressedKey]);
+  }, [keyboardLayout, leftScaleArrangement, rightScaleArrangement, rearrangeKeysLeft, rearrangeKeysRight, removePressedKey]);
 
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);

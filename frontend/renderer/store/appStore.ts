@@ -9,6 +9,8 @@ interface AppState {
   rightOctave: number;
   leftScaleArrangement: ScaleArrangement;
   rightScaleArrangement: ScaleArrangement;
+  rearrangeKeysLeft: boolean;
+  rearrangeKeysRight: boolean;
   selectedKey: number;
   showSettings: boolean;
   showActions: boolean;
@@ -21,6 +23,8 @@ interface AppState {
   setRightOctave: (octave: number) => void;
   setLeftScaleArrangement: (scale: ScaleArrangement) => void;
   setRightScaleArrangement: (scale: ScaleArrangement) => void;
+  setRearrangeKeysLeft: (rearrange: boolean) => void;
+  setRearrangeKeysRight: (rearrange: boolean) => void;
   setSelectedKey: (key: number) => void;
   toggleSettings: () => void;
   toggleActions: () => void;
@@ -37,6 +41,8 @@ export const useAppStore = create<AppState>((set, get) => ({
   rightOctave: 4,
   leftScaleArrangement: 'major',
   rightScaleArrangement: 'major',
+  rearrangeKeysLeft: false,
+  rearrangeKeysRight: false,
   selectedKey: 0,
   showSettings: false,
   showActions: false,
@@ -65,6 +71,14 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   setRightScaleArrangement: (scale) => {
     set({ rightScaleArrangement: scale });
+  },
+
+  setRearrangeKeysLeft: (rearrange) => {
+    set({ rearrangeKeysLeft: rearrange });
+  },
+
+  setRearrangeKeysRight: (rearrange) => {
+    set({ rearrangeKeysRight: rearrange });
   },
 
   setSelectedKey: (key) => {

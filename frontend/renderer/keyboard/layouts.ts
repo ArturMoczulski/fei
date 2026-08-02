@@ -1,7 +1,7 @@
 import type { KeyboardLayout, KeyMapping, ScaleArrangement } from '@shared/types';
 import qwertyDevice from '../../mappings/qwerty-device.json';
 import dvorakDevice from '../../mappings/dvorak-device.json';
-import { getSemitoneForAction } from '../audio/scales';
+import { getSemitoneForAction, getChromaticSemitoneForAction } from '../audio/scales';
 
 const NOTES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 
@@ -21,7 +21,13 @@ export function isBlackKey(note: string): boolean {
   return note.includes('#');
 }
 
-export function getLayout(type: KeyboardLayout, leftScaleArrangement: ScaleArrangement = 'chromatic', rightScaleArrangement: ScaleArrangement = 'chromatic'): KeyMapping[] {
+export function getLayout(
+  type: KeyboardLayout,
+  leftScaleArrangement: ScaleArrangement = 'major',
+  rightScaleArrangement: ScaleArrangement = 'major',
+  rearrangeLeft: boolean = false,
+  rearrangeRight: boolean = false
+): KeyMapping[] {
   const device = type === 'dvorak' ? dvorakDevice : qwertyDevice;
   const result: KeyMapping[] = [];
 
@@ -30,12 +36,18 @@ export function getLayout(type: KeyboardLayout, leftScaleArrangement: ScaleArran
   for (const hand of ['leftHand', 'rightHand'] as const) {
     const handData = device[hand];
     const handName = hand === 'leftHand' ? 'left' : 'right';
-    const scaleArrangement = hand === 'leftHand' ? leftScaleArrangement : rightScaleArrangement;
+    const shouldRearrange = hand === 'leftHand' ? rearrangeLeft : rearrangeRight;
 
     for (const row of rows) {
       const rowKeys = handData.soundButtons[row];
       for (const keyData of rowKeys) {
-        const semitone = getSemitoneForAction(scaleArrangement, handName, keyData.action);
+        let semitone: number;
+        if (shouldRearrange) {
+          const scaleArrangement = hand === 'leftHand' ? leftScaleArrangement : rightScaleArrangement;
+          semitone = getSemitoneForAction(scaleArrangement, handName, keyData.action);
+        } else {
+          semitone = getChromaticSemitoneForAction(handName, keyData.action);
+        }
         result.push({
           key: keyData.key,
           semitone,

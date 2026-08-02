@@ -67,8 +67,8 @@ describe('layouts', () => {
         return order.indexOf(aKey) - order.indexOf(bKey);
       });
 
-      expect(sortedByCol[0].semitone).toBe(11);
-      expect(sortedByCol[3].semitone).toBe(8);
+      expect(sortedByCol[0].semitone).toBe(3);
+      expect(sortedByCol[3].semitone).toBe(0);
     });
 
     it('should have semitone values 0-11 for sounds', () => {

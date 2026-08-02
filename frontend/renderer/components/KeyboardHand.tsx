@@ -22,13 +22,19 @@ function KeyboardHand({
 }: KeyboardHandProps) {
   const leftScaleArrangement = useAppStore(state => state.leftScaleArrangement);
   const rightScaleArrangement = useAppStore(state => state.rightScaleArrangement);
+  const rearrangeKeysLeft = useAppStore(state => state.rearrangeKeysLeft);
+  const rearrangeKeysRight = useAppStore(state => state.rearrangeKeysRight);
   const setLeftScaleArrangement = useAppStore(state => state.setLeftScaleArrangement);
   const setRightScaleArrangement = useAppStore(state => state.setRightScaleArrangement);
-  const layout = getLayout(keyboardLayout, leftScaleArrangement, rightScaleArrangement);
+  const setRearrangeKeysLeft = useAppStore(state => state.setRearrangeKeysLeft);
+  const setRearrangeKeysRight = useAppStore(state => state.setRearrangeKeysRight);
+  const currentScale = hand === 'left' ? leftScaleArrangement : rightScaleArrangement;
+  const rearrangeKeys = hand === 'left' ? rearrangeKeysLeft : rearrangeKeysRight;
+  const setRearrangeKeys = hand === 'left' ? setRearrangeKeysLeft : setRearrangeKeysRight;
+  const layout = getLayout(keyboardLayout, leftScaleArrangement, rightScaleArrangement, rearrangeKeysLeft, rearrangeKeysRight);
   const handMappings = layout.filter(m => m.hand === hand);
   const { setLeftOctave, setRightOctave, isPressed } = useAppStore();
 
-  const currentScale = hand === 'left' ? leftScaleArrangement : rightScaleArrangement;
   const setScale = hand === 'left' ? setLeftScaleArrangement : setRightScaleArrangement;
 
   const rows = ['upper', 'home', 'lower'] as const;
@@ -81,6 +87,14 @@ function KeyboardHand({
                 <option key={value} value={value}>{label}</option>
               ))}
             </select>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '10px' }}>
+              <input
+                type="checkbox"
+                checked={rearrangeKeys}
+                onChange={(e) => setRearrangeKeys(e.target.checked)}
+              />
+              Rearrange
+            </label>
             <span className="octave-display-inline">Octave {baseOctave}</span>
             <KeyBindingTooltip actions={[decreaseAction]} keyboardLayout={keyboardLayout}>
               <button
@@ -131,6 +145,14 @@ function KeyboardHand({
                 <option key={value} value={value}>{label}</option>
               ))}
             </select>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '10px' }}>
+              <input
+                type="checkbox"
+                checked={rearrangeKeys}
+                onChange={(e) => setRearrangeKeys(e.target.checked)}
+              />
+              Rearrange
+            </label>
           </div>
         )}
       </div>
