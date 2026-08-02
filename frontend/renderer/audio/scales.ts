@@ -27,16 +27,21 @@ export function getSemitoneForAction(
   const arrangement = SCALE_ARRANGEMENTS[scaleArrangement];
   const handData = hand === 'left' ? arrangement.leftHand : arrangement.rightHand;
   const value = (handData as Record<string, number>)[action];
-  return value !== undefined && value >= 0 ? value : 0;
+  return value !== undefined ? value : 0;
 }
 
-export function isSemitoneMapped(
-  scaleArrangement: ScaleArrangement,
-  hand: 'left' | 'right',
-  action: string
-): boolean {
-  const arrangement = SCALE_ARRANGEMENTS[scaleArrangement];
-  const handData = hand === 'left' ? arrangement.leftHand : arrangement.rightHand;
-  const value = (handData as Record<string, number>)[action];
-  return value !== undefined && value >= 0;
+export function semitonesToInterval(semitones: number): string {
+  if (semitones === 0) return '';
+  if (semitones === 1) return 'H';
+  if (semitones === 2) return 'W';
+  if (semitones === 3) return 'W+H';
+  if (semitones === 4) return 'WW';
+  if (semitones === 5) return 'WW+H';
+  if (semitones === 6) return 'WWW';
+  if (semitones === 7) return 'WWW+H';
+  if (semitones === 8) return 'WWWW';
+  if (semitones === 9) return 'WWWW+H';
+  if (semitones === 10) return 'WWWWW';
+  if (semitones === 11) return 'WWWWW+H';
+  return `${semitones}`;
 }

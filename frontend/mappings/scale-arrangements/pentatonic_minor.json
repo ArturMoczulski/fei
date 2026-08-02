@@ -1,32 +1,32 @@
 {
   "name": "PENTATONIC_MINOR",
-  "description": "Pentatonic minor scale arrangement - root (0) at home index, 5 notes",
+  "description": "Pentatonic minor scale arrangement - root (0) at home index. Home row: 0,3,5,7. Upper row: 10,1,4,6. Lower row: 2,8,9,11",
   "leftHand": {
-    "left_hand_sound_upper_pinky": -1,
-    "left_hand_sound_upper_ring": 9,
-    "left_hand_sound_upper_middle": -1,
-    "left_hand_sound_upper_index": 7,
-    "left_hand_sound_home_pinky": -1,
+    "left_hand_sound_upper_pinky": 6,
+    "left_hand_sound_upper_ring": 4,
+    "left_hand_sound_upper_middle": 1,
+    "left_hand_sound_upper_index": 10,
+    "left_hand_sound_home_pinky": 7,
     "left_hand_sound_home_ring": 5,
     "left_hand_sound_home_middle": 3,
     "left_hand_sound_home_index": 0,
-    "left_hand_sound_lower_pinky": 1,
-    "left_hand_sound_lower_ring": -1,
-    "left_hand_sound_lower_middle": -1,
-    "left_hand_sound_lower_index": -1
+    "left_hand_sound_lower_pinky": 11,
+    "left_hand_sound_lower_ring": 9,
+    "left_hand_sound_lower_middle": 8,
+    "left_hand_sound_lower_index": 2
   },
   "rightHand": {
-    "right_hand_sound_upper_index": 7,
-    "right_hand_sound_upper_middle": -1,
-    "right_hand_sound_upper_ring": 9,
-    "right_hand_sound_upper_pinky": -1,
+    "right_hand_sound_upper_index": 10,
+    "right_hand_sound_upper_middle": 1,
+    "right_hand_sound_upper_ring": 4,
+    "right_hand_sound_upper_pinky": 6,
     "right_hand_sound_home_index": 0,
     "right_hand_sound_home_middle": 3,
     "right_hand_sound_home_ring": 5,
-    "right_hand_sound_home_pinky": -1,
-    "right_hand_sound_lower_index": -1,
-    "right_hand_sound_lower_middle": -1,
-    "right_hand_sound_lower_ring": -1,
-    "right_hand_sound_lower_pinky": 1
+    "right_hand_sound_home_pinky": 7,
+    "right_hand_sound_lower_index": 2,
+    "right_hand_sound_lower_middle": 8,
+    "right_hand_sound_lower_ring": 9,
+    "right_hand_sound_lower_pinky": 11
   }
 }

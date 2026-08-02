@@ -4,6 +4,7 @@ import { useAppStore } from '../store/appStore';
 import type { KeyboardLayout, ScaleArrangement } from '@shared/types';
 import { SCALE_ARRANGEMENT_DISPLAY } from '@shared/types';
 import { getLayout, getKeyDisplayKey, semitoneToNote } from '../keyboard/layouts';
+import { semitonesToInterval } from '../audio/scales';
 
 interface KeyboardHandProps {
   hand: 'left' | 'right';
@@ -151,6 +152,7 @@ function KeyboardHand({
                   <div className="key-button-grid">
                     <div className="key-info note-name">{noteName}</div>
                     <div className="key-info interval">+{mapping.semitone}</div>
+                    <div className="key-info interval-step">{semitonesToInterval(mapping.semitone)}</div>
                     <div className="key-info frequency">{frequency.toFixed(0)}Hz</div>
                     <div className="key-center">
                       <span className="key-hint">{getKeyDisplayKey(mapping, keyboardLayout)}</span>
