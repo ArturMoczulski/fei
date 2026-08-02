@@ -182,3 +182,32 @@ When the **Scale Lock** is enabled (🔒), keys are rearranged according to the 
 This separation allows:
 - **Visual feedback**: See which keys are "in scale" via green highlighting
 - **Flexible playing**: Use chromatic mapping for maximum range or scale mapping for ergonomic patterns
+
+## Autoplay Mode
+
+Fei can load and play MIDI files while simulating actual button presses on the virtual keyboard.
+
+### How It Works
+
+1. **Load MIDI File**: User selects a MIDI file via the file picker
+2. **Parse MIDI**: The system reads the MIDI file and extracts note events (note on/off, pitch, timing)
+3. **Map to Buttons**: Each MIDI note is mapped to the appropriate keyboard button based on:
+   - The note's pitch (mapped to a semitone + octave)
+   - The current hand assignment (left/right)
+   - The key selector setting
+4. **Simulate Presses**: At the correct timing, the system dispatches keyboard events to "press" the corresponding buttons
+5. **Visual Feedback**: The pressed buttons highlight as if physically pressed by the user
+
+### Key Features
+
+- **Realistic simulation**: Buttons light up exactly as they would when playing manually
+- **Synchronized playback**: MIDI audio plays in sync with button presses
+- **Learning tool**: Users can watch and learn songs, seeing the exact finger positions used
+- **Speed control**: Adjustable playback speed for learning difficult passages
+
+### MIDI Mapping
+
+The MIDI file notes are mapped to Fei's isomorphic layout:
+- Each MIDI note (0-127) is converted to a Fei semitone (0-11) + octave
+- Notes below Fei's range are transposed up
+- Notes above Fei's range are transposed down (using octave shifts)

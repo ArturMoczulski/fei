@@ -102,6 +102,13 @@ body {
   overflow: hidden;
 }
 
+.autoplay-container {
+  position: absolute;
+  top: 56px;
+  right: 24px;
+  z-index: 10;
+}
+
 .hands-container {
   display: flex;
   gap: 32px;
@@ -847,4 +854,45 @@ body {
   padding: 2px 6px;
   border-radius: 4px;
   font-weight: 600;
+}
+
+.autoplay {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.autoplay-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.autoplay-btn:hover {
+  background: var(--surface-hover);
+  border-color: var(--primary);
+}
+
+.autoplay-btn.playing {
+  background: var(--secondary);
+  border-color: var(--secondary);
+  color: white;
+}
+
+.autoplay-filename {
+  font-size: 12px;
+  color: var(--text-muted);
+  max-width: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }

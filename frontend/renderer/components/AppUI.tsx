@@ -5,6 +5,7 @@ import SettingsModal from './SettingsModal';
 import ActionsListModal from './ActionsListModal';
 import KeySelector from './KeySelector';
 import Metronome from './Metronome';
+import Autoplay from './Autoplay';
 import { useAppStore } from '../store/appStore';
 import { getLayout, semitoneToNote } from '../keyboard/layouts';
 import type { KeyMapping } from '@shared/types';
@@ -52,6 +53,10 @@ export function AppUI() {
       />
 
       <div className="main-content">
+        <div className="autoplay-container">
+          <Autoplay />
+        </div>
+
         <div className="hands-container">
           <KeyboardHand
             hand="left"

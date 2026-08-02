@@ -16,6 +16,10 @@ interface AppState {
   showActions: boolean;
   audioReady: boolean;
   pressedKeys: Set<string>;
+  autoplayFile: File | null;
+  autoplayNotes: { key: string; hand: 'left' | 'right'; time: number; duration: number; frequency: number }[];
+  autoplayIsPlaying: boolean;
+  autoplayIsPaused: boolean;
 
   setKeyboardLayout: (layout: KeyboardLayout) => void;
   setVolume: (volume: number) => void;
@@ -32,6 +36,10 @@ interface AppState {
   addPressedKey: (key: string) => void;
   removePressedKey: (key: string) => void;
   isPressed: (key: string) => boolean;
+  setAutoplayFile: (file: File | null) => void;
+  setAutoplayNotes: (notes: { key: string; hand: 'left' | 'right'; time: number; duration: number; frequency: number }[]) => void;
+  setAutoplayIsPlaying: (playing: boolean) => void;
+  setAutoplayIsPaused: (paused: boolean) => void;
 }
 
 export const useAppStore = create<AppState>((set, get) => ({
@@ -48,6 +56,10 @@ export const useAppStore = create<AppState>((set, get) => ({
   showActions: false,
   audioReady: false,
   pressedKeys: new Set(),
+  autoplayFile: null,
+  autoplayNotes: [],
+  autoplayIsPlaying: false,
+  autoplayIsPaused: false,
 
   setKeyboardLayout: (layout) => {
     set({ keyboardLayout: layout });
@@ -102,4 +114,9 @@ export const useAppStore = create<AppState>((set, get) => ({
   }),
 
   isPressed: (key) => get().pressedKeys.has(key),
+
+  setAutoplayFile: (file) => set({ autoplayFile: file }),
+  setAutoplayNotes: (notes) => set({ autoplayNotes: notes }),
+  setAutoplayIsPlaying: (playing) => set({ autoplayIsPlaying: playing }),
+  setAutoplayIsPaused: (paused) => set({ autoplayIsPaused: paused }),
 }));
