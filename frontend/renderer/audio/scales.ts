@@ -15,6 +15,15 @@ export const SCALE_ARRANGEMENTS: Record<ScaleArrangement, typeof chromatic> = {
   pentatonic_minor,
 };
 
+export const SCALE_NOTES: Record<ScaleArrangement, number[]> = {
+  chromatic: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+  major: [0, 2, 4, 5, 7, 9, 11],
+  natural_minor: [0, 2, 3, 5, 7, 8, 10],
+  harmonic_minor: [0, 2, 3, 5, 7, 8, 11],
+  pentatonic_major: [0, 2, 4, 7, 9],
+  pentatonic_minor: [0, 3, 5, 7, 10],
+};
+
 export function getScaleArrangement(scaleArrangement: ScaleArrangement) {
   return SCALE_ARRANGEMENTS[scaleArrangement];
 }
@@ -44,4 +53,8 @@ export function semitonesToInterval(semitones: number): string {
   if (semitones === 10) return 'WWWWW';
   if (semitones === 11) return 'WWWWW+H';
   return `${semitones}`;
+}
+
+export function isInScale(semitone: number, scaleArrangement: ScaleArrangement): boolean {
+  return SCALE_NOTES[scaleArrangement].includes(semitone);
 }

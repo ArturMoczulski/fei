@@ -4,7 +4,7 @@ import { useAppStore } from '../store/appStore';
 import type { KeyboardLayout, ScaleArrangement } from '@shared/types';
 import { SCALE_ARRANGEMENT_DISPLAY } from '@shared/types';
 import { getLayout, getKeyDisplayKey, semitoneToNote } from '../keyboard/layouts';
-import { semitonesToInterval } from '../audio/scales';
+import { semitonesToInterval, isInScale } from '../audio/scales';
 
 interface KeyboardHandProps {
   hand: 'left' | 'right';
@@ -144,10 +144,11 @@ function KeyboardHand({
               const pressed = isPressed(mapping.key.toLowerCase());
               const noteName = semitoneToNote(mapping.semitone, selectedKey);
               const frequency = calculateFrequency(mapping.semitone, baseOctave);
+              const inScale = isInScale(mapping.semitone, currentScale);
               return (
                 <button
                   key={mapping.key}
-                  className={`key-button ${pressed ? 'pressed' : ''}`}
+                  className={`key-button ${pressed ? 'pressed' : ''} ${inScale ? 'in-scale' : ''}`}
                 >
                   <div className="key-button-grid">
                     <div className="key-info note-name">{noteName}</div>

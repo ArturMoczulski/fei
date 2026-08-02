@@ -245,6 +245,11 @@ body {
   padding: 8px;
 }
 
+.key-button.in-scale {
+  background: linear-gradient(180deg, #2a4a2a 0%, #1e3e1e 100%);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(100, 255, 100, 0.1);
+}
+
 .key-button-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -281,7 +286,7 @@ body {
 }
 
 .key-info.interval-step {
-  font-size: 10px;
+  font-size: 8px;
   opacity: 0.4;
   grid-column: 2;
   grid-row: 2;
