@@ -1,8 +1,9 @@
-import type { KeyboardLayout, KeyMapping } from '@shared/types';
+import type { KeyboardLayout, KeyMapping, ScaleArrangement } from '@shared/types';
 import qwertyDevice from '../../mappings/qwerty-device.json';
 import qwertySemitones from '../../mappings/qwerty-semitones.json';
 import dvorakDevice from '../../mappings/dvorak-device.json';
 import dvorakSemitones from '../../mappings/dvorak-semitones.json';
+import { arrangeSemitonesByConsonance } from '../audio/scales';
 
 const NOTES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 
@@ -22,7 +23,7 @@ export function isBlackKey(note: string): boolean {
   return note.includes('#');
 }
 
-export function getLayout(type: KeyboardLayout): KeyMapping[] {
+export function getLayout(type: KeyboardLayout, leftScaleArrangement: ScaleArrangement = 'chromatic', rightScaleArrangement: ScaleArrangement = 'chromatic'): KeyMapping[] {
   const device = type === 'dvorak' ? dvorakDevice : qwertyDevice;
   const semitones = type === 'dvorak' ? dvorakSemitones : qwertySemitones;
   const result: KeyMapping[] = [];
@@ -33,14 +34,24 @@ export function getLayout(type: KeyboardLayout): KeyMapping[] {
     const handData = device[hand];
     const handName = hand === 'leftHand' ? 'leftHand' : 'rightHand';
     const semitoneMap = semitones[handName as keyof typeof semitones] as Record<string, number>;
+    const scale = hand === 'leftHand' ? leftScaleArrangement : rightScaleArrangement;
+
+    const arrangedSemitones = arrangeSemitonesByConsonance([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], scale);
+
+    const upperRowSemitones = arrangedSemitones.slice(0, 4);
+    const homeRowSemitones = arrangedSemitones.slice(4, 8);
+    const lowerRowSemitones = arrangedSemitones.slice(8, 12);
+
+    const rowSemitones = { upper: upperRowSemitones, home: homeRowSemitones, lower: lowerRowSemitones };
 
     for (const row of rows) {
       const rowKeys = handData.soundButtons[row];
-      for (const keyData of rowKeys) {
-        const semitone = semitoneMap[keyData.action];
+      for (let i = 0; i < rowKeys.length; i++) {
+        const keyData = rowKeys[i];
+        const newSemitone = rowSemitones[row][i];
         result.push({
           key: keyData.key,
-          semitone,
+          semitone: newSemitone,
           hand: hand === 'leftHand' ? 'left' : 'right',
           row,
           action: keyData.action,

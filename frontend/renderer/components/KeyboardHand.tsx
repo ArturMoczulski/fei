@@ -1,7 +1,8 @@
 import React from 'react';
 import { KeyBindingTooltip } from './KeyBindingTooltip';
 import { useAppStore } from '../store/appStore';
-import type { KeyboardLayout } from '@shared/types';
+import type { KeyboardLayout, ScaleArrangement } from '@shared/types';
+import { SCALE_ARRANGEMENT_DISPLAY } from '@shared/types';
 import { getLayout, getKeyDisplayKey, semitoneToNote } from '../keyboard/layouts';
 
 interface KeyboardHandProps {
@@ -18,9 +19,16 @@ function KeyboardHand({
   keyboardLayout,
   selectedKey,
 }: KeyboardHandProps) {
-  const layout = getLayout(keyboardLayout);
+  const leftScaleArrangement = useAppStore(state => state.leftScaleArrangement);
+  const rightScaleArrangement = useAppStore(state => state.rightScaleArrangement);
+  const setLeftScaleArrangement = useAppStore(state => state.setLeftScaleArrangement);
+  const setRightScaleArrangement = useAppStore(state => state.setRightScaleArrangement);
+  const layout = getLayout(keyboardLayout, leftScaleArrangement, rightScaleArrangement);
   const handMappings = layout.filter(m => m.hand === hand);
   const { setLeftOctave, setRightOctave, isPressed } = useAppStore();
+
+  const currentScale = hand === 'left' ? leftScaleArrangement : rightScaleArrangement;
+  const setScale = hand === 'left' ? setLeftScaleArrangement : setRightScaleArrangement;
 
   const getMappingAt = (row: number, col: number) => {
     return handMappings[row * 4 + col];
@@ -59,6 +67,15 @@ function KeyboardHand({
       <div className="keymouse-header">
         {hand === 'left' ? (
           <div className="octave-controls-inline">
+            <select
+              className="scale-select-small"
+              value={currentScale}
+              onChange={(e) => setScale(e.target.value as ScaleArrangement)}
+            >
+              {Object.entries(SCALE_ARRANGEMENT_DISPLAY).map(([value, label]) => (
+                <option key={value} value={value}>{label}</option>
+              ))}
+            </select>
             <span className="octave-display-inline">Octave {baseOctave}</span>
             <KeyBindingTooltip actions={[decreaseAction]} keyboardLayout={keyboardLayout}>
               <button
@@ -100,6 +117,15 @@ function KeyboardHand({
               </button>
             </KeyBindingTooltip>
             <span className="octave-display-inline">Octave {baseOctave}</span>
+            <select
+              className="scale-select-small"
+              value={currentScale}
+              onChange={(e) => setScale(e.target.value as ScaleArrangement)}
+            >
+              {Object.entries(SCALE_ARRANGEMENT_DISPLAY).map(([value, label]) => (
+                <option key={value} value={value}>{label}</option>
+              ))}
+            </select>
           </div>
         )}
       </div>

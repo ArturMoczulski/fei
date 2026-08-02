@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { KeyboardLayout } from '@shared/types';
+import type { KeyboardLayout, ScaleArrangement } from '@shared/types';
 import { invoke } from '@tauri-apps/api/core';
 
 interface AppState {
@@ -7,6 +7,8 @@ interface AppState {
   volume: number;
   leftOctave: number;
   rightOctave: number;
+  leftScaleArrangement: ScaleArrangement;
+  rightScaleArrangement: ScaleArrangement;
   selectedKey: number;
   showSettings: boolean;
   showActions: boolean;
@@ -17,6 +19,8 @@ interface AppState {
   setVolume: (volume: number) => void;
   setLeftOctave: (octave: number) => void;
   setRightOctave: (octave: number) => void;
+  setLeftScaleArrangement: (scale: ScaleArrangement) => void;
+  setRightScaleArrangement: (scale: ScaleArrangement) => void;
   setSelectedKey: (key: number) => void;
   toggleSettings: () => void;
   toggleActions: () => void;
@@ -31,6 +35,8 @@ export const useAppStore = create<AppState>((set, get) => ({
   volume: -6,
   leftOctave: 3,
   rightOctave: 4,
+  leftScaleArrangement: 'chromatic',
+  rightScaleArrangement: 'chromatic',
   selectedKey: 0,
   showSettings: false,
   showActions: false,
@@ -51,6 +57,14 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   setRightOctave: (octave) => {
     set({ rightOctave: octave });
+  },
+
+  setLeftScaleArrangement: (scale) => {
+    set({ leftScaleArrangement: scale });
+  },
+
+  setRightScaleArrangement: (scale) => {
+    set({ rightScaleArrangement: scale });
   },
 
   setSelectedKey: (key) => {

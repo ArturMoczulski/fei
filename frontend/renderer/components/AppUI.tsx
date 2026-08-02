@@ -15,6 +15,8 @@ export function AppUI() {
     volume,
     leftOctave,
     rightOctave,
+    leftScaleArrangement,
+    rightScaleArrangement,
     selectedKey,
     showSettings,
     showActions,
@@ -27,7 +29,7 @@ export function AppUI() {
   } = useAppStore();
 
   const getActiveNotes = (hand: 'left' | 'right') => {
-    const layout = getLayout(keyboardLayout);
+    const layout = getLayout(keyboardLayout, leftScaleArrangement, rightScaleArrangement);
     const octave = hand === 'left' ? leftOctave : rightOctave;
     const activeNotes: { note: string; octave: number; key: string }[] = [];
 

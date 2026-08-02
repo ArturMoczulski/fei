@@ -1,5 +1,16 @@
 export type KeyboardLayout = 'qwerty' | 'dvorak';
 
+export type ScaleArrangement = 'chromatic' | 'major' | 'natural_minor' | 'harmonic_minor' | 'pentatonic_major' | 'pentatonic_minor';
+
+export const SCALE_ARRANGEMENT_DISPLAY: Record<ScaleArrangement, string> = {
+  chromatic: 'Chromatic (Sequential)',
+  major: 'Major (Consonant)',
+  natural_minor: 'Natural Minor',
+  harmonic_minor: 'Harmonic Minor',
+  pentatonic_major: 'Pentatonic Major',
+  pentatonic_minor: 'Pentatonic Minor',
+};
+
 export interface Settings {
   keyboardLayout: KeyboardLayout;
   masterVolume: number;
