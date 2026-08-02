@@ -26,5 +26,17 @@ export function getSemitoneForAction(
 ): number {
   const arrangement = SCALE_ARRANGEMENTS[scaleArrangement];
   const handData = hand === 'left' ? arrangement.leftHand : arrangement.rightHand;
-  return (handData as Record<string, number>)[action] ?? 0;
+  const value = (handData as Record<string, number>)[action];
+  return value !== undefined && value >= 0 ? value : 0;
+}
+
+export function isSemitoneMapped(
+  scaleArrangement: ScaleArrangement,
+  hand: 'left' | 'right',
+  action: string
+): boolean {
+  const arrangement = SCALE_ARRANGEMENTS[scaleArrangement];
+  const handData = hand === 'left' ? arrangement.leftHand : arrangement.rightHand;
+  const value = (handData as Record<string, number>)[action];
+  return value !== undefined && value >= 0;
 }

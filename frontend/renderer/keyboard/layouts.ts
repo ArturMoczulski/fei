@@ -1,7 +1,7 @@
 import type { KeyboardLayout, KeyMapping, ScaleArrangement } from '@shared/types';
 import qwertyDevice from '../../mappings/qwerty-device.json';
 import dvorakDevice from '../../mappings/dvorak-device.json';
-import { getSemitoneForAction } from '../audio/scales';
+import { getSemitoneForAction, isSemitoneMapped } from '../audio/scales';
 
 const NOTES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 
@@ -35,6 +35,9 @@ export function getLayout(type: KeyboardLayout, leftScaleArrangement: ScaleArran
     for (const row of rows) {
       const rowKeys = handData.soundButtons[row];
       for (const keyData of rowKeys) {
+        if (!isSemitoneMapped(scaleArrangement, handName, keyData.action)) {
+          continue;
+        }
         const semitone = getSemitoneForAction(scaleArrangement, handName, keyData.action);
         result.push({
           key: keyData.key,

@@ -1,32 +1,32 @@
 {
   "name": "HARMONIC_MINOR",
-  "description": "Harmonic minor scale arrangement - root (0) at home middle, consonant intervals on home row",
+  "description": "Harmonic minor scale arrangement - root (0) at home index, 7 notes",
   "leftHand": {
     "left_hand_sound_upper_pinky": 9,
     "left_hand_sound_upper_ring": 8,
-    "left_hand_sound_upper_middle": 11,
-    "left_hand_sound_upper_index": 2,
+    "left_hand_sound_upper_middle": -1,
+    "left_hand_sound_upper_index": 3,
     "left_hand_sound_home_pinky": 7,
     "left_hand_sound_home_ring": 5,
-    "left_hand_sound_home_middle": 0,
-    "left_hand_sound_home_index": 3,
+    "left_hand_sound_home_middle": 3,
+    "left_hand_sound_home_index": 0,
     "left_hand_sound_lower_pinky": 1,
-    "left_hand_sound_lower_ring": 4,
+    "left_hand_sound_lower_ring": -1,
     "left_hand_sound_lower_middle": 6,
-    "left_hand_sound_lower_index": 10
+    "left_hand_sound_lower_index": 11
   },
   "rightHand": {
-    "right_hand_sound_upper_index": 2,
-    "right_hand_sound_upper_middle": 11,
+    "right_hand_sound_upper_index": 3,
+    "right_hand_sound_upper_middle": -1,
     "right_hand_sound_upper_ring": 8,
     "right_hand_sound_upper_pinky": 9,
-    "right_hand_sound_home_index": 3,
-    "right_hand_sound_home_middle": 0,
+    "right_hand_sound_home_index": 0,
+    "right_hand_sound_home_middle": 3,
     "right_hand_sound_home_ring": 5,
     "right_hand_sound_home_pinky": 7,
-    "right_hand_sound_lower_index": 10,
+    "right_hand_sound_lower_index": 11,
     "right_hand_sound_lower_middle": 6,
-    "right_hand_sound_lower_ring": 4,
+    "right_hand_sound_lower_ring": -1,
     "right_hand_sound_lower_pinky": 1
   }
 }
